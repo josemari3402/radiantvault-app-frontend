@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import './nightmarket.css';
-// CHECK THIS NAME: must exactly match the file in your assets folder
 import nmBg from '../assets/nightmarket.png';
 
 const nightmarket = ({ allSkins }) => {
