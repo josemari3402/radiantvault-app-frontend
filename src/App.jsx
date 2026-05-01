@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios'; 
 import LoadoutLab from './components/LoadoutLab';
-import Nightmarket from './components/Nightmarket';
+import nightmarket from './components/nightmarket';
 import './App.css';
 import bgImage from './assets/background.png';
 import loginBGM from './assets/login_bgm.mp3';
@@ -123,7 +123,7 @@ function App() {
               onLogout={() => setInLab(false)} 
             />
           ) : (
-            <Nightmarket allSkins={allSkins} />
+            <nightmarket allSkins={allSkins} />
           )}
         </>
       )}

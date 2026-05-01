@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import './Nightmarket.css';
+import './nightmarket.css';
 // CHECK THIS NAME: must exactly match the file in your assets folder
 import nmBg from '../assets/nightmarket.png';
 
-const Nightmarket = ({ allSkins }) => {
+const nightmarket = ({ allSkins }) => {
   const [marketSkins, setMarketSkins] = useState([]);
 
   useEffect(() => {
@@ -64,4 +64,4 @@ const NMCard = ({ skin }) => {
   );
 };
 
-export default Nightmarket;
+export default nightmarket;
