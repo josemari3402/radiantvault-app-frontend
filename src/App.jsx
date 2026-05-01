@@ -84,6 +84,7 @@ function App() {
 
   // UPDATED: handleSaveLoadout now synchronizes with the MongoDB Vault
   const handleSaveLoadout = async (newLoadout) => {
+    console.log("Attempting to save for:", currentUser.username);
     try {
       await axios.post(`${API_BASE_URL}/save-loadout`, {
         username: currentUser.username, // MongoDB uses 'username' field
