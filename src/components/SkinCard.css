@@ -62,3 +62,31 @@
   background: #ff4655;
   color: white;
 }
+
+.gun-card {
+  width: 100%; 
+  min-height: 120px; /* Make the boxes taller to show more detail */
+  padding: 15px;
+  margin-bottom: 15px; /* Adds space between guns in the same column */
+  background: rgba(255, 255, 255, 0.05); /* Subtle background for the box */
+  border: 1px solid rgba(255, 255, 255, 0.1); 
+  transition: all 0.3s ease;
+}
+
+.gun-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-left: 4px solid #ff4655; /* Add a Valorant-red accent on hover */
+}
+
+.loadout-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* Assuming 4 columns */
+  gap: 40px; /* This is the "magic" number to stop the middle from collapsing */
+  padding: 20px;
+}
+
+.gun-logo {
+  width: 100%;
+  height: 80px; 
+  object-fit: contain;
+}
