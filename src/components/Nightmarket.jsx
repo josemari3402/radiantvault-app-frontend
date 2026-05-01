@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import './NightMarket.css';
+import './Nightmarket.css';
 // Import your new background image
 import nmBg from '../assets/nightmarket_bg.png';
 
-const NightMarket = ({ allSkins }) => {
+const Nightmarket = ({ allSkins }) => {
   const [marketSkins, setMarketSkins] = useState([]);
 
   useEffect(() => {
@@ -28,7 +28,7 @@ const NightMarket = ({ allSkins }) => {
         <h1 className="market-title">NIGHT.MARKET</h1>
         <div className="market-grid">
           {marketSkins.map((skin, index) => (
-            <NightMarketCard key={index} skin={skin} />
+            <NightmarketCard key={index} skin={skin} />
           ))}
         </div>
       </div>
@@ -36,7 +36,7 @@ const NightMarket = ({ allSkins }) => {
   );
 };
 
-const NightMarketCard = ({ skin }) => {
+const NightmarketCard = ({ skin }) => {
   const [isRevealed, setIsRevealed] = useState(false);
   const [discount] = useState(Math.floor(Math.random() * 40) + 10);
   const discountedPrice = Math.floor(skin.price * (1 - discount / 100));
@@ -70,4 +70,4 @@ const NightMarketCard = ({ skin }) => {
   );
 };
 
-export default NightMarket;
+export default Nightmarket;
