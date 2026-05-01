@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 import LoadoutLab from './components/LoadoutLab';
 import './App.css';
 import bgImage from './assets/background.png';
@@ -9,6 +10,9 @@ import chooseSFX from './assets/Choose.mp3';
 import gridHoverSFX from './assets/Gun grid hover.mp3';
 import gridSelectSFX from './assets/Gun grid select.mp3';
 import variantSelectSFX from './assets/Variant select.mp3';
+
+// The URL where your Flask server is running
+const API_BASE_URL = 'http://127.0.0.1:5000/api';
 
 function App() {
   const [inLab, setInLab] = useState(false);
@@ -54,21 +58,39 @@ function App() {
   const isValid = username.length >= 3 && username.length <= 16 && 
                   password.length >= 3 && password.length <= 16;
 
-  const handleAuth = () => {
-    const storedUsers = JSON.parse(localStorage.getItem('radiant_users') || '{}');
-    if (isSigningUp) {
-      if (storedUsers[username]) { alert("AGENT ID ALREADY REGISTERED"); return; }
-      storedUsers[username] = { password, loadout: {} };
-      localStorage.setItem('radiant_users', JSON.stringify(storedUsers));
-      alert("PROTOCOL ESTABLISHED. LOGIN TO CONTINUE.");
-      setIsSigningUp(false);
-      setPassword('');
-    } else {
-      const user = storedUsers[username];
-      if (user && user.password === password) {
-        setCurrentUser({ name: username, loadout: user.loadout });
+  // NEW: Updated Authentication Logic using Flask[cite: 1, 2]
+  const handleAuth = async () => {
+    const endpoint = isSigningUp ? '/signup' : '/login';
+    try {
+      const response = await axios.post(`${API_BASE_URL}${endpoint}`, {
+        username,
+        password
+      });
+      
+      if (isSigningUp) {
+        alert("PROTOCOL ESTABLISHED. LOGIN TO CONTINUE.");
+        setIsSigningUp(false);
+        setPassword('');
+      } else {
+        // response.data now contains { username, loadout } from MongoDB
+        setCurrentUser(response.data);
         setInLab(true);
-      } else { alert("INVALID CREDENTIALS"); }
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || "COMMUNICATION FAILURE WITH VAULT");
+    }
+  };
+
+  // NEW: Updated Save Logic using Flask[cite: 1, 2]
+  const handleSaveLoadout = async (newLoadout) => {
+    try {
+      await axios.post(`${API_BASE_URL}/save-loadout`, {
+        username: currentUser.username,
+        loadout: newLoadout
+      });
+      console.log("Loadout Synchronized with MongoDB");
+    } catch (err) {
+      console.error("Sync Failure:", err);
     }
   };
 
@@ -110,22 +132,18 @@ function App() {
         </div>
       ) : (
         <LoadoutLab 
-          agentName={currentUser.name} initialLoadout={currentUser.loadout}
-          bgmVolume={bgmVolume} sfxVolume={sfxVolume}
-          onBgmChange={setBgmVolume} onSfxChange={setSfxVolume}
+          agentName={currentUser.username} 
+          initialLoadout={currentUser.loadout}
+          bgmVolume={bgmVolume} 
+          sfxVolume={sfxVolume}
+          onBgmChange={setBgmVolume} 
+          onSfxChange={setSfxVolume}
           onHover={() => playSFX(sfxHover)}
           onChoose={() => playSFX(sfxChoose)}
           onGridHover={() => playSFX(sfxGridHover)}
           onGridSelect={() => playSFX(sfxGridSelect)}
           onVariantSelect={() => playSFX(sfxVariant)}
-          onSave={(newLoadout) => {
-            const storedUsers = JSON.parse(localStorage.getItem('radiant_users') || '{}');
-            if (storedUsers[username]) { 
-              // PERSISTENCE FIX: Save the entire object including card/title[cite: 2]
-              storedUsers[username].loadout = newLoadout; 
-              localStorage.setItem('radiant_users', JSON.stringify(storedUsers)); 
-            }
-          }}
+          onSave={handleSaveLoadout} 
           onLogout={() => { playSFX(sfxChoose); setInLab(false); setPassword(''); }} 
         />
       )}
