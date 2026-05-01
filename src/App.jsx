@@ -12,7 +12,7 @@ import gridSelectSFX from './assets/Gun grid select.mp3';
 import variantSelectSFX from './assets/Variant select.mp3';
 
 // The connection point to your Flask Brain
-const API_BASE_URL = 'http://127.0.0.1:5000/api';
+const API_BASE_URL = 'https://radiantvault-loadoutlab.azurewebsites.net/api';
 
 function App() {
   const [inLab, setInLab] = useState(false);
