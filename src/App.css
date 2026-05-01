@@ -1,0 +1,212 @@
+@import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
+
+* { box-sizing: border-box; }
+body, html, #root { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #0f1923; }
+
+.landing-page {
+  width: 100vw; height: 100vh;
+  background-size: 100% 100%;
+  background-position: center;
+  display: flex; justify-content: center; align-items: center;
+}
+
+.login-overlay {
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex; justify-content: center; align-items: center;
+}
+
+.login-box { 
+  display: flex; flex-direction: column; align-items: center; 
+  padding: 40px; background: rgba(15, 25, 35, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 70, 85, 0.2);
+}
+
+.auth-header {
+  font-family: 'Anton', sans-serif;
+  color: white; font-size: 24px;
+  letter-spacing: 5px; margin-bottom: 30px;
+}
+
+.username-input {
+  background: rgba(15, 25, 35, 0.9);
+  border: 2px solid #383e42;
+  padding: 15px 30px; width: 450px;
+  color: white; font-family: 'Anton', sans-serif;
+  font-size: 32px; text-align: center;
+  letter-spacing: 4px; outline: none; transition: 0.2s;
+}
+
+.pass-input { margin-top: 15px; font-size: 26px; }
+.username-input:focus { border-color: #ff4655; box-shadow: 0 0 15px rgba(255, 70, 85, 0.3); }
+
+.input-hint { font-family: 'Anton', sans-serif; color: #8b978f; font-size: 10px; margin: 10px 0 30px 0; letter-spacing: 2px; }
+
+.initialize-btn {
+  background: #ff4655; color: white; border: none;
+  padding: 20px 0; width: 450px;
+  font-family: 'Anton', sans-serif; font-size: 28px;
+  cursor: pointer; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+  transition: 0.2s;
+}
+
+.initialize-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.initialize-btn:hover:not(:disabled) { background: white; color: #ff4655; }
+
+.signup-toggle {
+  background: transparent; border: none;
+  color: #ff4655; font-family: 'Anton', sans-serif;
+  font-size: 12px; margin-top: 25px;
+  cursor: pointer; text-decoration: underline;
+  opacity: 0.7; transition: 0.2s;
+}
+.signup-toggle:hover { opacity: 1; color: white; }
+
+/* Volume Slider Styles */
+.volume-control-box, .lab-volume-box {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.lab-volume-box {
+  position: absolute;
+  top: 20px;
+  right: 180px; /* Positions it to the left of the Logout button */
+  margin-top: 0;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 5px 15px;
+  border: 1px solid rgba(255, 70, 85, 0.3);
+}
+
+.vol-label {
+  color: #ff4655;
+  font-family: 'Anton', sans-serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+}
+
+.tactical-slider {
+  appearance: none;         /* Standard property */
+  -webkit-appearance: none;  /* For Chrome and Safari */
+  -moz-appearance: none;     /* For Firefox */
+  width: 120px;
+  height: 4px;
+  background: #333;
+  outline: none;
+  cursor: pointer;
+}
+
+.tactical-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  background: #ff4655;
+  cursor: pointer;
+  border-radius: 0; /* Square thumb for tactical look */
+  transition: 0.2s;
+}
+
+.tactical-slider::-webkit-slider-thumb:hover {
+  background: white;
+  box-shadow: 0 0 10px #ff4655;
+}
+
+/* Dual Volume Layout */
+.dual-volume-container, .lab-volume-box {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+
+.vol-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Standardization Fix (No more yellow line) */
+.tactical-slider {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 100px;
+  height: 4px;
+  background: #333;
+  outline: none;
+  cursor: pointer;
+}
+
+.lab-volume-box {
+  position: absolute;
+  top: 20px;
+  right: 180px; 
+  background: rgba(15, 25, 35, 0.8);
+  backdrop-filter: blur(4px);
+  padding: 5px 20px;
+  border: 1px solid rgba(255, 70, 85, 0.3);
+}
+
+/* Ensuring font weights are preserved as bold/Anton */
+.gold-name-strip h2 {
+  font-weight: bold; /* Keeping original thickness */
+}
+
+.clean-title-display {
+  font-weight: bold; /* Keeping original thickness */
+}
+
+/* ... Keep your other App.css styles ... */
+
+.login-box { 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  padding: 40px; 
+  background: rgba(15, 25, 35, 0.85); /* Restored to more solid look */
+  backdrop-filter: blur(8px);
+}
+
+.auth-header {
+  font-family: 'Anton', sans-serif;
+  color: white; 
+  font-size: 24px;
+  letter-spacing: 5px; 
+  margin-bottom: 25px; /* Spacing above the inputs */
+  text-transform: uppercase;
+}
+
+/* THE RESTORED BUTTON */
+.initialize-btn {
+  background: #ff4655;
+  color: white;
+  border: none;
+  padding: 20px 0;
+  width: 450px; /* Matches the input width exactly */
+  font-family: 'Anton', sans-serif;
+  font-size: 28px;
+  cursor: pointer;
+  /* THE ORIGINAL VALORANT SLANT */
+  clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%); 
+  transition: 0.2s;
+  margin-top: 40px; /* Tight spacing below the hint */
+}
+
+.initialize-btn:disabled { 
+  opacity: 0.3; 
+  cursor: not-allowed; 
+}
+
+.initialize-btn:hover:not(:disabled) { 
+  background: white; 
+  color: #ff4655; 
+}
+
+/* Volume Sliders Container at the bottom */
+.dual-volume-container {
+  display: flex;
+  gap: 30px;
+  margin-top: 35px;
+}

@@ -1,0 +1,64 @@
+.skin-card {
+  background: #1f2326;
+  border: 1px solid #383e42;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.skin-card:hover {
+  transform: translateY(-8px);
+  border-color: #ff4655;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+}
+
+.rarity-bar {
+  height: 4px;
+  width: 100%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.skin-img {
+  width: 100%;
+  height: 140px;
+  object-fit: contain;
+  padding: 15px;
+  filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
+}
+
+.skin-info {
+  padding: 15px;
+  background: linear-gradient(to top, #111, transparent);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.skin-info h4 {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.equip-btn {
+  background: transparent;
+  border: 1px solid #ff4655;
+  color: #ff4655;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 5px 10px;
+  width: 100%;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.skin-card:hover .equip-btn {
+  background: #ff4655;
+  color: white;
+}
