@@ -52,7 +52,7 @@ function App() {
         }));
         setAllSkins(formattedSkins);
       } catch (err) {
-        console.error("Vault Data Retrieval Failure", err);
+        console.error("Vault Connection Failure", err);
       }
     };
     fetchSkins();
@@ -75,9 +75,6 @@ function App() {
     audioLab.current.volume = bgmVolume;
   }, [bgmVolume]);
 
-  const isValid = username.length >= 3 && username.length <= 16 && 
-                  password.length >= 3 && password.length <= 16;
-
   const handleAuth = async () => {
     const endpoint = isSigningUp ? '/signup' : '/login';
     try {
@@ -85,26 +82,14 @@ function App() {
         username, password
       });
       if (isSigningUp) {
-        alert("PROTOCOL ESTABLISHED. LOGIN TO CONTINUE.");
+        alert("PROTOCOL ESTABLISHED.");
         setIsSigningUp(false);
-        setPassword('');
       } else {
         setCurrentUser(response.data); 
         setInLab(true);
       }
     } catch (err) {
-      alert(err.response?.data?.message || "VAULT CONNECTION ERROR");
-    }
-  };
-
-  const handleSaveLoadout = async (newLoadout) => {
-    try {
-      await axios.post(`${API_BASE_URL}/save-loadout`, {
-        username: currentUser.username, 
-        loadout: newLoadout
-      });
-    } catch (err) {
-      console.error("Vault Sync Failure", err);
+      alert(err.response?.data?.message || "VAULT ERROR");
     }
   };
 
@@ -115,27 +100,13 @@ function App() {
           <div className="login-overlay">
             <div className="login-box">
               <h1 className="auth-header">{isSigningUp ? "CREATE ACCOUNT" : "AUTHENTICATE"}</h1>
-              <input type="text" className="username-input" placeholder="AGENT ID" value={username} maxLength={16} 
-                onChange={(e) => setUsername(e.target.value)} onMouseEnter={() => playSFX(sfxHover)} />
-              <input type="password" className="username-input pass-input" placeholder="ACCESS KEY" value={password} maxLength={16} 
-                onChange={(e) => setPassword(e.target.value)} onMouseEnter={() => playSFX(sfxHover)} />
-              <button className="initialize-btn" disabled={!isValid} 
-                onClick={() => { playSFX(sfxChoose); handleAuth(); }} 
-                onMouseEnter={() => playSFX(sfxHover)}>
-                {isSigningUp ? "REGISTER AGENT" : "INITIALIZE PROTOCOL"}
-              </button>
-              <button className="signup-toggle" 
-                onClick={() => { playSFX(sfxChoose); setIsSigningUp(!isSigningUp); setPassword(''); }}
-                onMouseEnter={() => playSFX(sfxHover)}>
-                {isSigningUp ? "ALREADY HAVE AN ACCOUNT? LOGIN" : "NEW AGENT? SIGN UP"}
-              </button>
+              <input type="text" className="username-input" placeholder="AGENT ID" value={username} onChange={(e) => setUsername(e.target.value)} />
+              <input type="password" className="username-input pass-input" placeholder="ACCESS KEY" value={password} onChange={(e) => setPassword(e.target.value)} />
+              <button className="initialize-btn" onClick={() => { playSFX(chooseSFX); handleAuth(); }}>INITIALIZE</button>
+              <button className="signup-toggle" onClick={() => setIsSigningUp(!isSigningUp)}>TOGGLE SIGNUP</button>
               <div className="dual-volume-container">
-                <div className="vol-item"><span className="vol-label">SFX</span>
-                  <input type="range" min="0" max="1" step="0.01" value={sfxVolume} onChange={(e) => setSfxVolume(e.target.value)} className="tactical-slider" />
-                </div>
-                <div className="vol-item"><span className="vol-label">AUDIO</span>
-                  <input type="range" min="0" max="1" step="0.01" value={bgmVolume} onChange={(e) => setBgmVolume(e.target.value)} className="tactical-slider" />
-                </div>
+                <input type="range" min="0" max="1" step="0.01" value={sfxVolume} onChange={(e) => setSfxVolume(e.target.value)} className="tactical-slider" />
+                <input type="range" min="0" max="1" step="0.01" value={bgmVolume} onChange={(e) => setBgmVolume(e.target.value)} className="tactical-slider" />
               </div>
             </div>
           </div>
@@ -143,18 +114,13 @@ function App() {
       ) : (
         <>
           <nav className="main-nav">
-            <button className={`nav-link ${currentView === 'lab' ? 'active' : ''}`} onClick={() => { playSFX(sfxChoose); setCurrentView('lab'); }}>THE VAULT</button>
-            <button className={`nav-link ${currentView === 'market' ? 'active' : ''}`} onClick={() => { playSFX(sfxChoose); setCurrentView('market'); }}>NIGHT MARKET</button>
+            <button className={`nav-link ${currentView === 'lab' ? 'active' : ''}`} onClick={() => setCurrentView('lab')}>THE VAULT</button>
+            <button className={`nav-link ${currentView === 'market' ? 'active' : ''}`} onClick={() => setCurrentView('market')}>NIGHT MARKET</button>
           </nav>
           {currentView === 'lab' ? (
             <LoadoutLab 
               agentName={currentUser.username} initialLoadout={currentUser.loadout}
-              bgmVolume={bgmVolume} sfxVolume={sfxVolume}
-              onBgmChange={setBgmVolume} onSfxChange={setSfxVolume}
-              onHover={() => playSFX(sfxHover)} onChoose={() => playSFX(sfxChoose)}
-              onGridHover={() => playSFX(sfxGridHover)} onGridSelect={() => playSFX(sfxGridSelect)}
-              onVariantSelect={() => playSFX(sfxVariant)} onSave={handleSaveLoadout} 
-              onLogout={() => { playSFX(sfxChoose); setInLab(false); setPassword(''); }} 
+              onLogout={() => setInLab(false)} 
             />
           ) : (
             <Nightmarket allSkins={allSkins} />
