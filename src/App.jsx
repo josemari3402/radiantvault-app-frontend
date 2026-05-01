@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios'; 
 import LoadoutLab from './components/LoadoutLab';
-import Nightmarket from './components/nightmarket'; // Matches your lowercase file name
+import Nightmarket from './components/nightmarket.jsx'; // Matches your lowercase file name
 import './App.css';
 
 // Assets
