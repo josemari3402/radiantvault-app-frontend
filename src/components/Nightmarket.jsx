@@ -1,20 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import './Nightmarket.css';
-// Import your new background image
-import nmBg from '../assets/nightmarket_bg.png';
+import nmBg from '../assets/nightmarket.png';
 
 const Nightmarket = ({ allSkins }) => {
   const [marketSkins, setMarketSkins] = useState([]);
 
   useEffect(() => {
-    // Filter: No Ultra, No Exclusive unless Melee
-    const validSkins = allSkins.filter(skin => {
-      const isUltra = skin.tier === "Ultra Edition";
-      const isExclusive = skin.tier === "Exclusive Edition";
-      const isMelee = skin.category === "Melee";
+    const ULTRA_TIER = "0cebb8be-46d7-c12a-d306-e9907ad5a0a1";
+    const EXCLUSIVE_TIER = "e0468541-403c-e400-3051-444772186842";
 
-      if (isUltra) return false;
-      if (isExclusive && !isMelee) return false;
+    const validSkins = allSkins.filter(skin => {
+      const name = skin.name.toLowerCase();
+      const isMelee = skin.category === "Melee";
+      const isLimited = name.includes("champions") || name.includes("arcane") || name.includes("vct") || name.includes("ignite");
+
+      if (isLimited) return false;
+      if (skin.tierUuid === ULTRA_TIER) return false;
+      if (skin.tierUuid === EXCLUSIVE_TIER && !isMelee) return false;
+      if (!skin.tierUuid) return false;
+
       return true;
     });
 
@@ -40,17 +44,25 @@ const NightmarketCard = ({ skin }) => {
   const [isRevealed, setIsRevealed] = useState(false);
   const [discount] = useState(Math.floor(Math.random() * 40) + 10);
   const discountedPrice = Math.floor(skin.price * (1 - discount / 100));
-  const tierClass = skin.tier.split(' ')[0].toLowerCase();
+
+  const getTierClass = (uuid) => {
+    switch(uuid) {
+      case "12683d76-48d7-84a3-4e09-69857a424b33": return "select";
+      case "3b62c16e-440d-327c-264d-910408542c16": return "deluxe";
+      case "d1548d44-4b3a-cc5b-86d7-73d84a7e9373": return "premium";
+      case "e0468541-403c-e400-3051-444772186842": return "exclusive";
+      default: return "premium";
+    }
+  };
+
+  const tierClass = getTierClass(skin.tierUuid);
 
   return (
     <div className={`market-card ${isRevealed ? 'flipped' : ''}`} onClick={() => setIsRevealed(true)}>
       <div className="card-inner">
-        {/* FRONT: Hidden State */}
         <div className={`card-front tier-border-${tierClass}`}>
           <div className="diamond-icon"></div>
         </div>
-
-        {/* BACK: Revealed State */}
         <div className={`card-back tier-bg-${tierClass}`}>
           <div className="discount-badge">-{discount}%</div>
           <div className="price-container">

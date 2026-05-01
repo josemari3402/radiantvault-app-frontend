@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios'; 
 import LoadoutLab from './components/LoadoutLab';
-import Nightmarket from './components/Nightmarket'; // Import your new component
+import Nightmarket from './components/Nightmarket';
 import './App.css';
 import bgImage from './assets/background.png';
 import loginBGM from './assets/login_bgm.mp3';
@@ -16,8 +16,8 @@ const API_BASE_URL = 'https://radiantvault-loadoutlab.azurewebsites.net/api';
 
 function App() {
   const [inLab, setInLab] = useState(false);
-  const [currentView, setCurrentView] = useState('lab'); // NEW: Controls the view
-  const [allSkins, setAllSkins] = useState([]); // NEW: Holds skins for the Market
+  const [currentView, setCurrentView] = useState('lab'); 
+  const [allSkins, setAllSkins] = useState([]); 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isSigningUp, setIsSigningUp] = useState(false);
@@ -27,7 +27,6 @@ function App() {
 
   const audioLogin = useRef(new Audio(loginBGM));
   const audioLab = useRef(new Audio(labBGM));
-  
   const sfxHover = useRef(new Audio(hoverSFX));
   const sfxChoose = useRef(new Audio(chooseSFX));
   const sfxGridHover = useRef(new Audio(gridHoverSFX));
@@ -40,23 +39,20 @@ function App() {
     ref.current.play().catch(() => {});
   };
 
-  // NEW: Fetching skins for the Night Market from public API
   useEffect(() => {
     const fetchSkins = async () => {
       try {
         const res = await axios.get('https://valorant-api.com/v1/weapons/skins');
-        // Mapping API data to match your Night Market component needs
         const formattedSkins = res.data.data.map(skin => ({
           name: skin.displayName,
           image: skin.displayIcon,
-          tier: skin.contentTierUuid === '0cebb8be-46d7-c12a-d306-e9907ad5a0a1' ? 'Ultra Edition' : 
-                skin.contentTierUuid === 'e0468541-403c-e400-3051-444772186842' ? 'Exclusive Edition' : 'Premium Edition',
-          category: skin.assetPath.split('/')[3], // Simple way to get category
-          price: 1775 // Default price placeholder
+          tierUuid: skin.contentTierUuid,
+          category: skin.assetPath.split('/')[3],
+          price: 1775 
         }));
         setAllSkins(formattedSkins);
       } catch (err) {
-        console.error("Failed to fetch skins for Market", err);
+        console.error("Vault Data Retrieval Failure", err);
       }
     };
     fetchSkins();
@@ -86,10 +82,8 @@ function App() {
     const endpoint = isSigningUp ? '/signup' : '/login';
     try {
       const response = await axios.post(`${API_BASE_URL}${endpoint}`, {
-        username,
-        password
+        username, password
       });
-      
       if (isSigningUp) {
         alert("PROTOCOL ESTABLISHED. LOGIN TO CONTINUE.");
         setIsSigningUp(false);
@@ -110,7 +104,7 @@ function App() {
         loadout: newLoadout
       });
     } catch (err) {
-      console.error("Sync Failure:", err);
+      console.error("Vault Sync Failure", err);
     }
   };
 
@@ -123,22 +117,18 @@ function App() {
               <h1 className="auth-header">{isSigningUp ? "CREATE ACCOUNT" : "AUTHENTICATE"}</h1>
               <input type="text" className="username-input" placeholder="AGENT ID" value={username} maxLength={16} 
                 onChange={(e) => setUsername(e.target.value)} onMouseEnter={() => playSFX(sfxHover)} />
-              
               <input type="password" className="username-input pass-input" placeholder="ACCESS KEY" value={password} maxLength={16} 
                 onChange={(e) => setPassword(e.target.value)} onMouseEnter={() => playSFX(sfxHover)} />
-              
               <button className="initialize-btn" disabled={!isValid} 
                 onClick={() => { playSFX(sfxChoose); handleAuth(); }} 
                 onMouseEnter={() => playSFX(sfxHover)}>
                 {isSigningUp ? "REGISTER AGENT" : "INITIALIZE PROTOCOL"}
               </button>
-
               <button className="signup-toggle" 
                 onClick={() => { playSFX(sfxChoose); setIsSigningUp(!isSigningUp); setPassword(''); }}
                 onMouseEnter={() => playSFX(sfxHover)}>
                 {isSigningUp ? "ALREADY HAVE AN ACCOUNT? LOGIN" : "NEW AGENT? SIGN UP"}
               </button>
-
               <div className="dual-volume-container">
                 <div className="vol-item"><span className="vol-label">SFX</span>
                   <input type="range" min="0" max="1" step="0.01" value={sfxVolume} onChange={(e) => setSfxVolume(e.target.value)} className="tactical-slider" />
@@ -152,35 +142,18 @@ function App() {
         </div>
       ) : (
         <>
-          {/* NEW: Top Navigation Bar */}
           <nav className="main-nav">
-            <button 
-              className={`nav-link ${currentView === 'lab' ? 'active' : ''}`} 
-              onClick={() => { playSFX(sfxChoose); setCurrentView('lab'); }}
-            >
-              THE VAULT
-            </button>
-            <button 
-              className={`nav-link ${currentView === 'market' ? 'active' : ''}`} 
-              onClick={() => { playSFX(sfxChoose); setCurrentView('market'); }}
-            >
-              NIGHT MARKET
-            </button>
+            <button className={`nav-link ${currentView === 'lab' ? 'active' : ''}`} onClick={() => { playSFX(sfxChoose); setCurrentView('lab'); }}>THE VAULT</button>
+            <button className={`nav-link ${currentView === 'market' ? 'active' : ''}`} onClick={() => { playSFX(sfxChoose); setCurrentView('market'); }}>NIGHT MARKET</button>
           </nav>
-
-          {/* NEW: View Switching Logic */}
           {currentView === 'lab' ? (
             <LoadoutLab 
-              agentName={currentUser.username} 
-              initialLoadout={currentUser.loadout}
+              agentName={currentUser.username} initialLoadout={currentUser.loadout}
               bgmVolume={bgmVolume} sfxVolume={sfxVolume}
               onBgmChange={setBgmVolume} onSfxChange={setSfxVolume}
-              onHover={() => playSFX(sfxHover)}
-              onChoose={() => playSFX(sfxChoose)}
-              onGridHover={() => playSFX(sfxGridHover)}
-              onGridSelect={() => playSFX(sfxGridSelect)}
-              onVariantSelect={() => playSFX(sfxVariant)}
-              onSave={handleSaveLoadout} 
+              onHover={() => playSFX(sfxHover)} onChoose={() => playSFX(sfxChoose)}
+              onGridHover={() => playSFX(sfxGridHover)} onGridSelect={() => playSFX(sfxGridSelect)}
+              onVariantSelect={() => playSFX(sfxVariant)} onSave={handleSaveLoadout} 
               onLogout={() => { playSFX(sfxChoose); setInLab(false); setPassword(''); }} 
             />
           ) : (
