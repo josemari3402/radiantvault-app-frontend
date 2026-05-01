@@ -1,4 +1,3 @@
-/* Kill the Vite Default Constraints */
 :root {
   margin: 0;
   padding: 0;
@@ -10,5 +9,6 @@ html, body, #root {
   width: 100%;
   height: 100%;
   background-color: #0f1923; /* Valorant Dark Blue */
-  overflow: hidden; /* Stops double scrollbars */
+  overflow: hidden; 
+  font-family: 'Anton', sans-serif;
 }

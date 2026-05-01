@@ -210,3 +210,46 @@ body, html, #root { margin: 0; padding: 0; width: 100%; height: 100%; overflow: 
   gap: 30px;
   margin-top: 35px;
 }
+
+/* --- Navigation Styles --- */
+.main-nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  background: rgba(15, 25, 35, 0.9);
+  border-bottom: 1px solid rgba(255, 70, 85, 0.2);
+  z-index: 100;
+  backdrop-filter: blur(10px);
+}
+
+.nav-link {
+  background: transparent;
+  border: none;
+  color: #8b978f;
+  font-family: 'Anton', sans-serif;
+  font-size: 18px;
+  letter-spacing: 3px;
+  cursor: pointer;
+  transition: 0.3s;
+  padding: 5px 15px;
+}
+
+.nav-link:hover {
+  color: white;
+}
+
+.nav-link.active {
+  color: #ff4655;
+  border-bottom: 2px solid #ff4655;
+}
+
+/* Adjust LoadoutLab to fit under the Nav */
+.lab-container {
+  margin-top: 60px;
+}

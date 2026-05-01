@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios'; // Critical for backend communication
+import axios from 'axios'; 
 import LoadoutLab from './components/LoadoutLab';
+import NightMarket from './components/NightMarket'; // Import your new component
 import './App.css';
 import bgImage from './assets/background.png';
 import loginBGM from './assets/login_bgm.mp3';
@@ -11,11 +12,12 @@ import gridHoverSFX from './assets/gun-grid-hover.mp3';
 import gridSelectSFX from './assets/gun-grid-select.mp3';
 import variantSelectSFX from './assets/variant-select.mp3';
 
-// The connection point to your Flask Brain
 const API_BASE_URL = 'https://radiantvault-loadoutlab.azurewebsites.net/api';
 
 function App() {
   const [inLab, setInLab] = useState(false);
+  const [currentView, setCurrentView] = useState('lab'); // NEW: Controls the view
+  const [allSkins, setAllSkins] = useState([]); // NEW: Holds skins for the Market
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isSigningUp, setIsSigningUp] = useState(false);
@@ -38,6 +40,28 @@ function App() {
     ref.current.play().catch(() => {});
   };
 
+  // NEW: Fetching skins for the Night Market from public API
+  useEffect(() => {
+    const fetchSkins = async () => {
+      try {
+        const res = await axios.get('https://valorant-api.com/v1/weapons/skins');
+        // Mapping API data to match your Night Market component needs
+        const formattedSkins = res.data.data.map(skin => ({
+          name: skin.displayName,
+          image: skin.displayIcon,
+          tier: skin.contentTierUuid === '0cebb8be-46d7-c12a-d306-e9907ad5a0a1' ? 'Ultra Edition' : 
+                skin.contentTierUuid === 'e0468541-403c-e400-3051-444772186842' ? 'Exclusive Edition' : 'Premium Edition',
+          category: skin.assetPath.split('/')[3], // Simple way to get category
+          price: 1775 // Default price placeholder
+        }));
+        setAllSkins(formattedSkins);
+      } catch (err) {
+        console.error("Failed to fetch skins for Market", err);
+      }
+    };
+    fetchSkins();
+  }, []);
+
   useEffect(() => {
     audioLogin.current.loop = true;
     audioLab.current.loop = true;
@@ -58,7 +82,6 @@ function App() {
   const isValid = username.length >= 3 && username.length <= 16 && 
                   password.length >= 3 && password.length <= 16;
 
-  // UPDATED: handleAuth now sends data to Flask/MongoDB
   const handleAuth = async () => {
     const endpoint = isSigningUp ? '/signup' : '/login';
     try {
@@ -72,25 +95,20 @@ function App() {
         setIsSigningUp(false);
         setPassword('');
       } else {
-        // Response data will contain { username, loadout } from MongoDB
         setCurrentUser(response.data); 
         setInLab(true);
       }
     } catch (err) {
-      // Displays the specific error message from your Flask backend
       alert(err.response?.data?.message || "VAULT CONNECTION ERROR");
     }
   };
 
-  // UPDATED: handleSaveLoadout now synchronizes with the MongoDB Vault
   const handleSaveLoadout = async (newLoadout) => {
-    console.log("Attempting to save for:", currentUser.username);
     try {
       await axios.post(`${API_BASE_URL}/save-loadout`, {
-        username: currentUser.username, // MongoDB uses 'username' field
+        username: currentUser.username, 
         loadout: newLoadout
       });
-      console.log("Loadout Synchronized.");
     } catch (err) {
       console.error("Sync Failure:", err);
     }
@@ -133,19 +151,42 @@ function App() {
           </div>
         </div>
       ) : (
-        <LoadoutLab 
-          agentName={currentUser.username} // Updated to match MongoDB field[cite: 3]
-          initialLoadout={currentUser.loadout}
-          bgmVolume={bgmVolume} sfxVolume={sfxVolume}
-          onBgmChange={setBgmVolume} onSfxChange={setSfxVolume}
-          onHover={() => playSFX(sfxHover)}
-          onChoose={() => playSFX(sfxChoose)}
-          onGridHover={() => playSFX(sfxGridHover)}
-          onGridSelect={() => playSFX(sfxGridSelect)}
-          onVariantSelect={() => playSFX(sfxVariant)}
-          onSave={handleSaveLoadout} 
-          onLogout={() => { playSFX(sfxChoose); setInLab(false); setPassword(''); }} 
-        />
+        <>
+          {/* NEW: Top Navigation Bar */}
+          <nav className="main-nav">
+            <button 
+              className={`nav-link ${currentView === 'lab' ? 'active' : ''}`} 
+              onClick={() => { playSFX(sfxChoose); setCurrentView('lab'); }}
+            >
+              THE VAULT
+            </button>
+            <button 
+              className={`nav-link ${currentView === 'market' ? 'active' : ''}`} 
+              onClick={() => { playSFX(sfxChoose); setCurrentView('market'); }}
+            >
+              NIGHT MARKET
+            </button>
+          </nav>
+
+          {/* NEW: View Switching Logic */}
+          {currentView === 'lab' ? (
+            <LoadoutLab 
+              agentName={currentUser.username} 
+              initialLoadout={currentUser.loadout}
+              bgmVolume={bgmVolume} sfxVolume={sfxVolume}
+              onBgmChange={setBgmVolume} onSfxChange={setSfxVolume}
+              onHover={() => playSFX(sfxHover)}
+              onChoose={() => playSFX(sfxChoose)}
+              onGridHover={() => playSFX(sfxGridHover)}
+              onGridSelect={() => playSFX(sfxGridSelect)}
+              onVariantSelect={() => playSFX(sfxVariant)}
+              onSave={handleSaveLoadout} 
+              onLogout={() => { playSFX(sfxChoose); setInLab(false); setPassword(''); }} 
+            />
+          ) : (
+            <NightMarket allSkins={allSkins} />
+          )}
+        </>
       )}
     </div>
   );
