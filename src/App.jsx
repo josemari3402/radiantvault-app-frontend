@@ -7,9 +7,9 @@ import loginBGM from './assets/login_bgm.mp3';
 import labBGM from './assets/lab_bgm.mp3';
 import hoverSFX from './assets/Hover.mp3';
 import chooseSFX from './assets/Choose.mp3';
-import gridHoverSFX from './assets/Gun grid hover.mp3';
-import gridSelectSFX from './assets/Gun grid select.mp3';
-import variantSelectSFX from './assets/Variant select.mp3';
+import gridHoverSFX from './assets/gun-grid-hover.mp3';
+import gridSelectSFX from './assets/gun-grid-select.mp3';
+import variantSelectSFX from './assets/variant-select.mp3';
 
 // The connection point to your Flask Brain
 const API_BASE_URL = 'https://radiantvault-loadoutlab.azurewebsites.net/api';
