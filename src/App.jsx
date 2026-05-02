@@ -10,9 +10,6 @@ import loginBGM from './assets/login_bgm.mp3';
 import labBGM from './assets/lab_bgm.mp3';
 import hoverSFX from './assets/Hover.mp3';
 import chooseSFX from './assets/Choose.mp3';
-import gridHoverSFX from './assets/gun-grid-hover.mp3';
-import gridSelectSFX from './assets/gun-grid-select.mp3';
-import variantSelectSFX from './assets/variant-select.mp3';
 
 const API_BASE_URL = 'https://radiantvault-loadoutlab.azurewebsites.net/api';
 
@@ -31,9 +28,6 @@ function App() {
   const audioLab = useRef(new Audio(labBGM));
   const sfxHover = useRef(new Audio(hoverSFX));
   const sfxChoose = useRef(new Audio(chooseSFX));
-  const sfxGridHover = useRef(new Audio(gridHoverSFX));
-  const sfxGridSelect = useRef(new Audio(gridSelectSFX));
-  const sfxVariant = useRef(new Audio(variantSelectSFX));
 
   const playSFX = (ref) => {
     ref.current.currentTime = 0;
@@ -45,23 +39,17 @@ function App() {
     const fetchSkins = async () => {
       try {
         const res = await axios.get('https://valorant-api.com/v1/weapons/skins');
-        const formatted = res.data.data.map(s => ({
-          displayName: s.displayName,
-          displayIcon: s.displayIcon,
-          tierUuid: s.contentTierUuid,
-          category: s.assetPath?.split('/')[3] || 'Unknown',
-          assetPath: s.assetPath || ''
-        }));
-        setAllSkins(formatted);
+        // We use displayName and displayIcon directly to match the API structure
+        setAllSkins(res.data.data);
       } catch (err) { console.error("Vault Data Failure", err); }
     };
     fetchSkins();
   }, []);
 
-  // MASTER AUDIO SYNC: Corrects the non-functional volume sliders
   useEffect(() => {
     audioLogin.current.loop = audioLab.current.loop = true;
     audioLogin.current.volume = audioLab.current.volume = bgmVolume;
+
     if (!inLab) {
       audioLab.current.pause();
       audioLogin.current.play().catch(() => {});
@@ -79,14 +67,16 @@ function App() {
         alert("PROTOCOL ESTABLISHED. LOGIN TO CONTINUE.");
         setIsSigningUp(false);
       } else {
-        setCurrentUser(res.data); 
+        const userData = res.data;
+        if (!userData.loadout) userData.loadout = {};
+        setCurrentUser(userData); 
         setInLab(true);
       }
     } catch (err) { alert("AUTHENTICATION FAILURE"); }
   };
 
   const handleSave = async (newLoadout) => {
-    // Force state refresh so Grid and Variants update immediately[cite: 7, 9]
+    // Force immediate UI update to fix the selection lockout
     setCurrentUser(prev => ({ ...prev, loadout: newLoadout }));
     try {
       await axios.post(`${API_BASE_URL}/save-loadout`, {
@@ -142,8 +132,7 @@ function App() {
                 bgmVolume={bgmVolume} sfxVolume={sfxVolume}
                 onBgmChange={setBgmVolume} onSfxChange={setSfxVolume}
                 onHover={() => playSFX(sfxHover)} onChoose={() => playSFX(sfxChoose)}
-                onGridHover={() => playSFX(sfxGridHover)} onGridSelect={() => playSFX(sfxGridSelect)}
-                onVariantSelect={() => playSFX(sfxVariant)} onSave={handleSave} 
+                onSave={handleSave} 
                 onLogout={() => { playSFX(sfxChoose); setInLab(false); }} 
               />
             ) : (
