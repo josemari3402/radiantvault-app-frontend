@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios'; 
 import LoadoutLab from './components/LoadoutLab';
-import Nightmarket from './components/nightmarket';
+import Nightmarket from './components/nightmarket'; // Lowercase path[cite: 4, 9]
 import './App.css';
 
 // Assets
@@ -24,10 +24,10 @@ function App() {
   const [bgmVolume, setBgmVolume] = useState(0.5);
   const [sfxVolume, setSfxVolume] = useState(0.5);
 
-  const audioLogin = useRef(new Audio(loginBGM));
-  const audioLab = useRef(new Audio(labBGM));
   const sfxHover = useRef(new Audio(hoverSFX));
   const sfxChoose = useRef(new Audio(chooseSFX));
+  const audioLogin = useRef(new Audio(loginBGM));
+  const audioLab = useRef(new Audio(labBGM));
 
   const playSFX = (ref) => {
     ref.current.currentTime = 0;
@@ -39,15 +39,19 @@ function App() {
     const fetchSkins = async () => {
       try {
         const res = await axios.get('https://valorant-api.com/v1/weapons/skins');
-        const formatted = res.data.data.map(skin => ({
-          name: skin.displayName,
-          image: skin.displayIcon,
-          tierUuid: skin.contentTierUuid,
-          category: skin.assetPath.split('/')[3],
-          price: 1775 
-        }));
+        // SAFETY: Only format skins that have a valid assetPath
+        const formatted = res.data.data
+          .filter(skin => skin.assetPath) 
+          .map(skin => ({
+            name: skin.displayName,
+            image: skin.displayIcon,
+            tierUuid: skin.contentTierUuid,
+            category: skin.assetPath.split('/')[3] || "Unknown",
+            assetPath: skin.assetPath,
+            price: 1775 
+          }));
         setAllSkins(formatted);
-      } catch (err) { console.error("Vault Sync Error", err); }
+      } catch (err) { console.error("Vault Retrieval Error", err); }
     };
     fetchSkins();
   }, []);
@@ -78,7 +82,16 @@ function App() {
         setCurrentUser(res.data); 
         setInLab(true);
       }
-    } catch (err) { alert("VAULT CONNECTION ERROR"); }
+    } catch (err) { alert(err.response?.data?.message || "VAULT CONNECTION ERROR"); }
+  };
+
+  const handleSaveLoadout = async (newLoadout) => {
+    try {
+      await axios.post(`${API_BASE_URL}/save-loadout`, {
+        username: currentUser.username, 
+        loadout: newLoadout
+      });
+    } catch (err) { console.error("Sync Failure", err); }
   };
 
   return (
@@ -90,15 +103,12 @@ function App() {
               <h1 className="auth-header">{isSigningUp ? "CREATE ACCOUNT" : "AUTHENTICATE"}</h1>
               <input type="text" className="username-input" placeholder="AGENT ID" value={username} onChange={(e) => setUsername(e.target.value)} onMouseEnter={() => playSFX(sfxHover)} />
               <input type="password" className="username-input pass-input" placeholder="ACCESS KEY" value={password} onChange={(e) => setPassword(e.target.value)} onMouseEnter={() => playSFX(sfxHover)} />
-              
               <button className="initialize-btn" onClick={() => { playSFX(sfxChoose); handleAuth(); }} onMouseEnter={() => playSFX(sfxHover)}>
                 {isSigningUp ? "REGISTER AGENT" : "INITIALIZE PROTOCOL"}
               </button>
-
               <button className="signup-toggle" onClick={() => { playSFX(sfxChoose); setIsSigningUp(!isSigningUp); }} onMouseEnter={() => playSFX(sfxHover)}>
                 {isSigningUp ? "ALREADY HAVE AN ACCOUNT? LOGIN" : "NEW AGENT? SIGN UP"}
               </button>
-
               <div className="dual-volume-container">
                 <div className="vol-item"><span className="vol-label">SFX</span>
                   <input type="range" min="0" max="1" step="0.01" value={sfxVolume} onChange={(e) => setSfxVolume(e.target.value)} className="tactical-slider" />
@@ -127,6 +137,7 @@ function App() {
                 bgmVolume={bgmVolume} sfxVolume={sfxVolume}
                 onBgmChange={setBgmVolume} onSfxChange={setSfxVolume}
                 onHover={() => playSFX(sfxHover)} onChoose={() => playSFX(sfxChoose)}
+                onSave={handleSaveLoadout}
                 onLogout={() => { playSFX(sfxChoose); setInLab(false); }} 
               />
             ) : (
