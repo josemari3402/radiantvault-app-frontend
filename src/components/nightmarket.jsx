@@ -6,7 +6,7 @@ const Nightmarket = ({ allSkins, onBack, bgmVolume, sfxVolume, onBgmChange, onSf
   const [marketSkins, setMarketSkins] = useState([]);
 
   useEffect(() => {
-    // Official Tiers
+    // Official Tier UUIDs[cite: 3]
     const SELECT = "12683d76-48d7-84a3-4e09-69857a424b33";
     const DELUXE = "3b62c16e-440d-327c-264d-910408542c16";
     const PREMIUM = "d1548d44-4b3a-cc5b-86d7-73d84a7e9373";
@@ -16,14 +16,15 @@ const Nightmarket = ({ allSkins, onBack, bgmVolume, sfxVolume, onBgmChange, onSf
     if (allSkins.length === 0) return;
 
     const filtered = allSkins.filter(skin => {
+      // Safety Guards
       if (!skin.assetPath || !skin.tierUuid) return false;
 
       const path = skin.assetPath.toLowerCase();
-      const name = skin.name?.toLowerCase() || "";
+      const name = skin.name.toLowerCase();
       const isMelee = skin.category === "Melee";
 
-      // 1. STRICTOR BATTLEPASS EXCLUSION[cite: 4]
-      if (path.includes("battlepass") || path.includes("season") || path.includes("episode")) return false;
+      // 1. EXCLUDE BATTLEPASS (All Seasons/Beta)
+      if (path.includes("battlepass") || path.includes("season")) return false;
 
       // 2. EXCLUDE LIMITED AND ULTRA[cite: 4]
       if (name.includes("champions") || name.includes("arcane") || name.includes("vct") || name.includes("ignite")) return false;
@@ -32,10 +33,11 @@ const Nightmarket = ({ allSkins, onBack, bgmVolume, sfxVolume, onBgmChange, onSf
       // 3. EXCLUDE EXCLUSIVE GUNS (BUT ALLOW MELEE)[cite: 4]
       if (skin.tierUuid === EXCLUSIVE && !isMelee) return false;
 
-      // 4. ONLY ALLOW REMAINING ELIGIBLE TIERS[cite: 4]
+      // 4. ALLOW ONLY ELIGIBLE TIERS[cite: 4]
       return [SELECT, DELUXE, PREMIUM, EXCLUSIVE].includes(skin.tierUuid);
     });
 
+    console.log(`Night Market Pool Calibrated: ${filtered.length} eligible skins.`);
     setMarketSkins(filtered.sort(() => 0.5 - Math.random()).slice(0, 6));
   }, [allSkins]);
 
@@ -44,7 +46,7 @@ const Nightmarket = ({ allSkins, onBack, bgmVolume, sfxVolume, onBgmChange, onSf
       <div className="nm-overlay">
         <div className="nm-top-bar">
           <button className="tactical-btn" onClick={onBack} onMouseEnter={onHover}>◄ BACK</button>
-          <div className="nm-volume-box">
+          <div className="nm-vol-box">
             <div className="vol-item"><span className="vol-label">SFX</span>
               <input type="range" min="0" max="1" step="0.01" value={sfxVolume} onChange={(e) => onSfxChange(e.target.value)} className="tactical-slider" />
             </div>
@@ -69,9 +71,9 @@ const Nightmarket = ({ allSkins, onBack, bgmVolume, sfxVolume, onBgmChange, onSf
 
 const NMCard = ({ skin }) => {
   const [flipped, setFlipped] = useState(false);
-  const [discount] = useState(Math.floor(Math.random() * 41) + 10);
+  const [discount] = useState(Math.floor(Math.random() * 40) + 10);
   
-  const getTierInfo = () => {
+  const getTier = () => {
     if (skin.category === "Melee") return "exclusive"; // Gold
     switch(skin.tierUuid) {
       case "12683d76-48d7-84a3-4e09-69857a424b33": return "select";  // Blue[cite: 8]
@@ -80,7 +82,7 @@ const NMCard = ({ skin }) => {
     }
   };
 
-  const tier = getTierInfo();
+  const tier = getTier();
 
   return (
     <div className={`nm-card ${flipped ? 'flipped' : ''}`} onClick={() => setFlipped(true)}>

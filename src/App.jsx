@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios'; 
 import LoadoutLab from './components/LoadoutLab';
-import Nightmarket from './components/nightmarket';
+import Nightmarket from './components/nightmarket'; 
 import './App.css';
 
 // Assets
@@ -45,12 +45,12 @@ function App() {
     const fetchSkins = async () => {
       try {
         const res = await axios.get('https://valorant-api.com/v1/weapons/skins');
-        const formatted = res.data.data.map(skin => ({
-          name: skin.displayName,
-          image: skin.displayIcon,
-          tierUuid: skin.contentTierUuid,
-          category: skin.assetPath?.split('/')[3] || 'Unknown',
-          assetPath: skin.assetPath,
+        const formatted = res.data.data.map(s => ({
+          name: s.displayName,
+          image: s.displayIcon,
+          tierUuid: s.contentTierUuid,
+          category: s.assetPath?.split('/')[3] || 'Unknown',
+          assetPath: s.assetPath || '',
           price: 1775 
         }));
         setAllSkins(formatted);
@@ -59,10 +59,10 @@ function App() {
     fetchSkins();
   }, []);
 
+  // MASTER AUDIO SYNC
   useEffect(() => {
     audioLogin.current.loop = audioLab.current.loop = true;
     audioLogin.current.volume = audioLab.current.volume = bgmVolume;
-
     if (!inLab) {
       audioLab.current.pause();
       audioLogin.current.play().catch(() => {});
@@ -87,7 +87,7 @@ function App() {
   };
 
   const handleSave = async (newLoadout) => {
-    // Update local state first so UI responds immediately[cite: 7]
+    // CRITICAL: Update local state so Grid/Skins/Variants react
     setCurrentUser(prev => ({ ...prev, loadout: newLoadout }));
     try {
       await axios.post(`${API_BASE_URL}/save-loadout`, {
