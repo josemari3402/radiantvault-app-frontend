@@ -4,9 +4,9 @@ import nmBg from '../assets/nightmarket_bg.png';
 
 const Nightmarket = ({ allSkins, onBack, bgmVolume, sfxVolume, onBgmChange, onSfxChange, onHover }) => {
   const [marketSkins, setMarketSkins] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Official Tier UUIDs
     const SELECT = "12683d76-48d7-84a3-4e09-69857a424b33";
     const DELUXE = "3b62c16e-440d-327c-264d-910408542c16";
     const PREMIUM = "d1548d44-4b3a-cc5b-86d7-73d84a7e9373";
@@ -16,27 +16,26 @@ const Nightmarket = ({ allSkins, onBack, bgmVolume, sfxVolume, onBgmChange, onSf
     if (!allSkins || allSkins.length === 0) return;
 
     const filtered = allSkins.filter(skin => {
-      // Defensive checks to prevent filter crashes
-      if (!skin.contentTierUuid || !skin.displayIcon) return false;
-
-      const name = skin.displayName?.toLowerCase() || "";
       const path = skin.assetPath?.toLowerCase() || "";
-      const isMelee = skin.category === "Melee" || path.includes("melee");
+      const name = skin.displayName?.toLowerCase() || "";
+      const isMelee = path.includes("melee");
 
-      // Strict Exclusions (Battle Pass Beta-2026, Limited, Ultra)
-      if (path.includes("battlepass") || path.includes("season") || path.includes("episode")) return false;
-      if (name.includes("champions") || name.includes("arcane") || name.includes("vct") || name.includes("ignite")) return false;
+      // 1. HARD BATTLEPASS EXCLUSION
+      if (path.includes("battlepass") || path.includes("season")) return false;
+
+      // 2. EXCLUDE ULTRA & LIMITED
+      if (name.includes("champions") || name.includes("arcane") || name.includes("vct")) return false;
       if (skin.contentTierUuid === ULTRA) return false;
+
+      // 3. EXCLUDE EXCLUSIVE GUNS (Keep Melee)
       if (skin.contentTierUuid === EXCLUSIVE && !isMelee) return false;
 
       return [SELECT, DELUXE, PREMIUM, EXCLUSIVE].includes(skin.contentTierUuid);
     });
 
-    // FALLBACK: If over-filtering results in 0, use a general pool
-    let pool = filtered.length > 0 ? filtered : allSkins.filter(s => s.displayIcon && s.contentTierUuid);
-    
+    // Fallback if filter is too strict
+    const pool = filtered.length > 0 ? filtered : allSkins.filter(s => s.displayIcon && s.contentTierUuid);
     setMarketSkins(pool.sort(() => 0.5 - Math.random()).slice(0, 6));
-    setLoading(false);
   }, [allSkins]);
 
   return (
@@ -55,12 +54,10 @@ const Nightmarket = ({ allSkins, onBack, bgmVolume, sfxVolume, onBgmChange, onSf
         </div>
         <h1 className="nm-title">NIGHT.MARKET</h1>
         <div className="nm-grid">
-          {loading ? (
-            <p className="nm-status">CALIBRATING OFFERS...</p>
-          ) : marketSkins.length > 0 ? (
+          {marketSkins.length > 0 ? (
             marketSkins.map((skin, i) => <NMCard key={i} skin={skin} />)
           ) : (
-            <p className="nm-status">NO OFFERS AVAILABLE</p>
+            <p className="nm-status">CALIBRATING OFFERS...</p>
           )}
         </div>
       </div>
@@ -74,11 +71,11 @@ const NMCard = ({ skin }) => {
   
   const getTier = () => {
     const path = skin.assetPath?.toLowerCase() || "";
-    if (path.includes("melee") || skin.category === "Melee") return "exclusive"; // Gold
+    if (path.includes("melee")) return "exclusive"; // Gold
     switch(skin.contentTierUuid) {
-      case "12683d76-48d7-84a3-4e09-69857a424b33": return "select";  // Blue
-      case "3b62c16e-440d-327c-264d-910408542c16": return "deluxe"; // Green
-      default: return "premium"; // Magenta
+      case "12683d76-48d7-84a3-4e09-69857a424b33": return "select";  
+      case "3b62c16e-440d-327c-264d-910408542c16": return "deluxe"; 
+      default: return "premium"; 
     }
   };
 
