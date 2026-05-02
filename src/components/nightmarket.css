@@ -1,9 +1,7 @@
 .nm-container { 
-  width: 100vw; 
-  height: 100vh; 
-  background-color: #0f1923; /* FALLBACK COLOR[cite: 3, 5] */
-  background-size: cover; 
-  background-position: center; 
+  width: 100vw; height: 100vh; 
+  background-size: cover; background-position: center; 
+  background-color: #0f1923; /* Dark fallback */
 }
 .nm-overlay { width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .nm-title { color: #ece8e1; font-family: 'Anton', sans-serif; font-size: 5rem; margin-bottom: 50px; }
@@ -20,12 +18,13 @@
 .nm-price { position: absolute; top: 15px; right: 15px; color: #ece8e1; font-family: 'Anton', sans-serif; }
 .nm-info { padding: 15px; background: linear-gradient(to top, black, transparent); }
 .nm-info h4 { color: white; margin: 0; font-size: 0.9rem; text-transform: uppercase; }
+.nm-status { color: white; font-family: 'Anton', sans-serif; letter-spacing: 2px; }
 
 /* Tier Colors */
-.tier-border-select { color: #5a9fe2; } 
-.tier-border-deluxe { color: #00adaa; } 
-.tier-border-premium { color: #d1548d; } 
-.tier-border-exclusive { color: #ffad5c; }
+.tier-border-select { color: #5a9fe2; }    /* Blue */
+.tier-border-deluxe { color: #00adaa; }    /* Green */
+.tier-border-premium { color: #d1548d; }   /* Magenta */
+.tier-border-exclusive { color: #ffad5c; } /* Gold */
 
 .tier-bg-select { background: linear-gradient(135deg, #0f1923, #1e364d); }
 .tier-bg-deluxe { background: linear-gradient(135deg, #0f1923, #004d4b); }
@@ -33,14 +32,15 @@
 .tier-bg-exclusive { background: linear-gradient(135deg, #0f1923, #5c3b1e); }
 
 .nm-top-bar {
-  position: absolute;
-  top: 80px; 
-  width: 100%;
-  padding: 0 40px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: 10;
+  position: absolute; top: 80px; width: 100%;
+  padding: 0 40px; display: flex;
+  justify-content: space-between; align-items: center;
+}
+
+.nm-volume-box {
+  background: rgba(15, 25, 35, 0.8);
+  padding: 5px 20px; border: 1px solid rgba(255, 70, 85, 0.3);
+  display: flex; gap: 30px;
 }
 
 .nm-info h4 {
