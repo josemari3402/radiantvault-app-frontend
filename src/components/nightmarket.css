@@ -16,8 +16,10 @@
 .nm-info h4 { color: white; margin: 0; font-size: 0.9rem; text-transform: uppercase; }
 
 /* Tier Colors */
-.tier-border-select { color: #5a9fe2; } .tier-border-deluxe { color: #00adaa; } 
-.tier-border-premium { color: #d1548d; } .tier-border-exclusive { color: #ffad5c; }
+.tier-border-select { color: #5a9fe2; }    /* Select (Blue) */
+.tier-border-deluxe { color: #00adaa; }    /* Deluxe (Green) */
+.tier-border-premium { color: #d1548d; }   /* Premium (Magenta) */
+.tier-border-exclusive { color: #ffad5c; } /* Exclusive Melee (Gold) */
 .tier-bg-select { background: linear-gradient(135deg, #0f1923, #1e364d); }
 .tier-bg-deluxe { background: linear-gradient(135deg, #0f1923, #004d4b); }
 .tier-bg-premium { background: linear-gradient(135deg, #0f1923, #4d1e36); }
@@ -25,7 +27,7 @@
 
 .nm-top-bar {
   position: absolute;
-  top: 80px; /* Below the nav bar */
+  top: 80px; 
   width: 100%;
   padding: 0 40px;
   display: flex;
@@ -34,9 +36,10 @@
 }
 
 .nm-info h4 {
-  color: white;
+  color: #ece8e1;
   margin: 0;
   font-size: 0.9rem;
   text-transform: uppercase;
-  text-align: center; /* Centered for cleaner look */
+  text-align: center;
+  font-family: 'Anton', sans-serif;
 }
