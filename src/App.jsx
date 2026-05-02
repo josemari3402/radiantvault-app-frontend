@@ -4,7 +4,7 @@ import LoadoutLab from './components/LoadoutLab';
 import Nightmarket from './components/nightmarket';
 import './App.css';
 
-// Asset Imports
+// Assets
 import bgImage from './assets/background.png';
 import loginBGM from './assets/login_bgm.mp3';
 import labBGM from './assets/lab_bgm.mp3';
@@ -45,15 +45,16 @@ function App() {
     const fetchSkins = async () => {
       try {
         const res = await axios.get('https://valorant-api.com/v1/weapons/skins');
-        setAllSkins(res.data.data.map(s => ({
-          name: s.displayName,
-          image: s.displayIcon,
-          tierUuid: s.contentTierUuid,
-          category: s.assetPath?.split('/')[3],
-          assetPath: s.assetPath,
+        const formatted = res.data.data.map(skin => ({
+          name: skin.displayName,
+          image: skin.displayIcon,
+          tierUuid: skin.contentTierUuid,
+          category: skin.assetPath?.split('/')[3] || 'Unknown',
+          assetPath: skin.assetPath,
           price: 1775 
-        })));
-      } catch (err) { console.error("Vault Error", err); }
+        }));
+        setAllSkins(formatted);
+      } catch (err) { console.error("Vault Data Failure", err); }
     };
     fetchSkins();
   }, []);
@@ -61,22 +62,39 @@ function App() {
   useEffect(() => {
     audioLogin.current.loop = audioLab.current.loop = true;
     audioLogin.current.volume = audioLab.current.volume = bgmVolume;
-    !inLab ? (audioLab.current.pause(), audioLogin.current.play().catch(() => {})) 
-           : (audioLogin.current.pause(), audioLab.current.play().catch(() => {}));
+
+    if (!inLab) {
+      audioLab.current.pause();
+      audioLogin.current.play().catch(() => {});
+    } else {
+      audioLogin.current.pause();
+      audioLab.current.play().catch(() => {});
+    }
   }, [inLab, bgmVolume]);
 
   const handleAuth = async () => {
     const endpoint = isSigningUp ? '/signup' : '/login';
     try {
       const res = await axios.post(`${API_BASE_URL}${endpoint}`, { username, password });
-      if (isSigningUp) { alert("PROTOCOL ESTABLISHED."); setIsSigningUp(false); }
-      else { setCurrentUser(res.data); setInLab(true); }
+      if (isSigningUp) {
+        alert("PROTOCOL ESTABLISHED. LOGIN TO CONTINUE.");
+        setIsSigningUp(false);
+      } else {
+        setCurrentUser(res.data); 
+        setInLab(true);
+      }
     } catch (err) { alert("AUTHENTICATION FAILURE"); }
   };
 
-  const handleSave = async (loadout) => {
-    try { await axios.post(`${API_BASE_URL}/save-loadout`, { username: currentUser.username, loadout }); }
-    catch (err) { console.error("Sync Error", err); }
+  const handleSave = async (newLoadout) => {
+    // Update local state first so UI responds immediately[cite: 7]
+    setCurrentUser(prev => ({ ...prev, loadout: newLoadout }));
+    try {
+      await axios.post(`${API_BASE_URL}/save-loadout`, {
+        username: currentUser.username, 
+        loadout: newLoadout
+      });
+    } catch (err) { console.error("Sync Error", err); }
   };
 
   return (
@@ -88,18 +106,21 @@ function App() {
               <h1 className="auth-header">{isSigningUp ? "CREATE ACCOUNT" : "AUTHENTICATE"}</h1>
               <input type="text" className="username-input" placeholder="AGENT ID" value={username} onChange={(e) => setUsername(e.target.value)} onMouseEnter={() => playSFX(sfxHover)} />
               <input type="password" className="username-input pass-input" placeholder="ACCESS KEY" value={password} onChange={(e) => setPassword(e.target.value)} onMouseEnter={() => playSFX(sfxHover)} />
+              
               <button className="initialize-btn" onClick={() => { playSFX(sfxChoose); handleAuth(); }} onMouseEnter={() => playSFX(sfxHover)}>
                 {isSigningUp ? "REGISTER AGENT" : "INITIALIZE PROTOCOL"}
               </button>
+
               <button className="signup-toggle" onClick={() => { playSFX(sfxChoose); setIsSigningUp(!isSigningUp); }} onMouseEnter={() => playSFX(sfxHover)}>
                 {isSigningUp ? "ALREADY HAVE AN ACCOUNT? LOGIN" : "NEW AGENT? SIGN UP"}
               </button>
+
               <div className="dual-volume-container">
                 <div className="vol-item"><span className="vol-label">SFX</span>
-                  <input type="range" min="0" max="1" step="0.01" value={sfxVolume} onChange={(e) => setSfxVolume(e.target.value)} />
+                  <input type="range" min="0" max="1" step="0.01" value={sfxVolume} onChange={(e) => setSfxVolume(e.target.value)} className="tactical-slider" />
                 </div>
                 <div className="vol-item"><span className="vol-label">AUDIO</span>
-                  <input type="range" min="0" max="1" step="0.01" value={bgmVolume} onChange={(e) => setBgmVolume(e.target.value)} />
+                  <input type="range" min="0" max="1" step="0.01" value={bgmVolume} onChange={(e) => setBgmVolume(e.target.value)} className="tactical-slider" />
                 </div>
               </div>
             </div>
@@ -109,9 +130,11 @@ function App() {
         <>
           <nav className="main-nav">
             <button className={`nav-link ${currentView === 'lab' ? 'active' : ''}`} 
-              onMouseEnter={() => playSFX(sfxHover)} onClick={() => { playSFX(sfxChoose); setCurrentView('lab'); }}>THE VAULT</button>
+              onMouseEnter={() => playSFX(sfxHover)}
+              onClick={() => { playSFX(sfxChoose); setCurrentView('lab'); }}>THE VAULT</button>
             <button className={`nav-link ${currentView === 'market' ? 'active' : ''}`} 
-              onMouseEnter={() => playSFX(sfxHover)} onClick={() => { playSFX(sfxChoose); setCurrentView('market'); }}>NIGHT MARKET</button>
+              onMouseEnter={() => playSFX(sfxHover)}
+              onClick={() => { playSFX(sfxChoose); setCurrentView('market'); }}>NIGHT MARKET</button>
           </nav>
           <main className="content-view">
             {currentView === 'lab' ? (
@@ -125,9 +148,13 @@ function App() {
                 onLogout={() => { playSFX(sfxChoose); setInLab(false); }} 
               />
             ) : (
-              <Nightmarket allSkins={allSkins} onBack={() => setCurrentView('lab')}
+              <Nightmarket 
+                allSkins={allSkins} 
+                onBack={() => { playSFX(sfxChoose); setCurrentView('lab'); }}
                 bgmVolume={bgmVolume} sfxVolume={sfxVolume}
-                onBgmChange={setBgmVolume} onSfxChange={setSfxVolume} onHover={() => playSFX(sfxHover)} />
+                onBgmChange={setBgmVolume} onSfxChange={setSfxVolume}
+                onHover={() => playSFX(sfxHover)}
+              />
             )}
           </main>
         </>
