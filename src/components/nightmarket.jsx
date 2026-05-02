@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './nightmarket.css';
-import nmBg from '../assets/nightmarket.png';
+import nmBg from '/src/assets/nightmarket.png';
 
 const Nightmarket = ({ allSkins }) => {
   const [marketSkins, setMarketSkins] = useState([]);
