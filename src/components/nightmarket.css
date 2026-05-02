@@ -22,3 +22,21 @@
 .tier-bg-deluxe { background: linear-gradient(135deg, #0f1923, #004d4b); }
 .tier-bg-premium { background: linear-gradient(135deg, #0f1923, #4d1e36); }
 .tier-bg-exclusive { background: linear-gradient(135deg, #0f1923, #5c3b1e); }
+
+.nm-top-bar {
+  position: absolute;
+  top: 80px; /* Below the nav bar */
+  width: 100%;
+  padding: 0 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nm-info h4 {
+  color: white;
+  margin: 0;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  text-align: center; /* Centered for cleaner look */
+}
