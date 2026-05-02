@@ -46,12 +46,11 @@ function App() {
       try {
         const res = await axios.get('https://valorant-api.com/v1/weapons/skins');
         const formatted = res.data.data.map(s => ({
-          name: s.displayName,
-          image: s.displayIcon,
+          displayName: s.displayName,
+          displayIcon: s.displayIcon,
           tierUuid: s.contentTierUuid,
           category: s.assetPath?.split('/')[3] || 'Unknown',
-          assetPath: s.assetPath || '',
-          price: 1775 
+          assetPath: s.assetPath || ''
         }));
         setAllSkins(formatted);
       } catch (err) { console.error("Vault Data Failure", err); }
@@ -59,7 +58,7 @@ function App() {
     fetchSkins();
   }, []);
 
-  // MASTER AUDIO SYNC
+  // MASTER AUDIO SYNC: Corrects the non-functional volume sliders
   useEffect(() => {
     audioLogin.current.loop = audioLab.current.loop = true;
     audioLogin.current.volume = audioLab.current.volume = bgmVolume;
@@ -87,7 +86,7 @@ function App() {
   };
 
   const handleSave = async (newLoadout) => {
-    // CRITICAL: Update local state so Grid/Skins/Variants react
+    // Force state refresh so Grid and Variants update immediately[cite: 7, 9]
     setCurrentUser(prev => ({ ...prev, loadout: newLoadout }));
     try {
       await axios.post(`${API_BASE_URL}/save-loadout`, {
