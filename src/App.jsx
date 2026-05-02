@@ -39,8 +39,15 @@ function App() {
     const fetchSkins = async () => {
       try {
         const res = await axios.get('https://valorant-api.com/v1/weapons/skins');
-        // We use displayName and displayIcon directly to match the API structure
-        setAllSkins(res.data.data);
+        // SYNC: Using official API property names to fix the selection lock
+        const formatted = res.data.data.map(s => ({
+          displayName: s.displayName,
+          displayIcon: s.displayIcon,
+          contentTierUuid: s.contentTierUuid,
+          assetPath: s.assetPath || "",
+          category: s.assetPath?.split('/')[3] || 'Unknown'
+        }));
+        setAllSkins(formatted);
       } catch (err) { console.error("Vault Data Failure", err); }
     };
     fetchSkins();
@@ -49,7 +56,6 @@ function App() {
   useEffect(() => {
     audioLogin.current.loop = audioLab.current.loop = true;
     audioLogin.current.volume = audioLab.current.volume = bgmVolume;
-
     if (!inLab) {
       audioLab.current.pause();
       audioLogin.current.play().catch(() => {});
@@ -68,6 +74,7 @@ function App() {
         setIsSigningUp(false);
       } else {
         const userData = res.data;
+        // Safety: Ensure loadout is never undefined
         if (!userData.loadout) userData.loadout = {};
         setCurrentUser(userData); 
         setInLab(true);
@@ -76,7 +83,7 @@ function App() {
   };
 
   const handleSave = async (newLoadout) => {
-    // Force immediate UI update to fix the selection lockout
+    // SYNC: Update local state immediately so Lab items are selectable
     setCurrentUser(prev => ({ ...prev, loadout: newLoadout }));
     try {
       await axios.post(`${API_BASE_URL}/save-loadout`, {
@@ -95,15 +102,12 @@ function App() {
               <h1 className="auth-header">{isSigningUp ? "CREATE ACCOUNT" : "AUTHENTICATE"}</h1>
               <input type="text" className="username-input" placeholder="AGENT ID" value={username} onChange={(e) => setUsername(e.target.value)} onMouseEnter={() => playSFX(sfxHover)} />
               <input type="password" className="username-input pass-input" placeholder="ACCESS KEY" value={password} onChange={(e) => setPassword(e.target.value)} onMouseEnter={() => playSFX(sfxHover)} />
-              
               <button className="initialize-btn" onClick={() => { playSFX(sfxChoose); handleAuth(); }} onMouseEnter={() => playSFX(sfxHover)}>
                 {isSigningUp ? "REGISTER AGENT" : "INITIALIZE PROTOCOL"}
               </button>
-
               <button className="signup-toggle" onClick={() => { playSFX(sfxChoose); setIsSigningUp(!isSigningUp); }} onMouseEnter={() => playSFX(sfxHover)}>
                 {isSigningUp ? "ALREADY HAVE AN ACCOUNT? LOGIN" : "NEW AGENT? SIGN UP"}
               </button>
-
               <div className="dual-volume-container">
                 <div className="vol-item"><span className="vol-label">SFX</span>
                   <input type="range" min="0" max="1" step="0.01" value={sfxVolume} onChange={(e) => setSfxVolume(e.target.value)} className="tactical-slider" />
@@ -137,8 +141,7 @@ function App() {
               />
             ) : (
               <Nightmarket 
-                allSkins={allSkins} 
-                onBack={() => { playSFX(sfxChoose); setCurrentView('lab'); }}
+                allSkins={allSkins} onBack={() => { playSFX(sfxChoose); setCurrentView('lab'); }}
                 bgmVolume={bgmVolume} sfxVolume={sfxVolume}
                 onBgmChange={setBgmVolume} onSfxChange={setSfxVolume}
                 onHover={() => playSFX(sfxHover)}

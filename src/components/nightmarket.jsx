@@ -16,23 +16,23 @@ const Nightmarket = ({ allSkins, onBack, bgmVolume, sfxVolume, onBgmChange, onSf
     if (!allSkins || allSkins.length === 0) return;
 
     const filtered = allSkins.filter(skin => {
-      // FIX 1: Make requirements defensive so missing fields don't crash the filter
+      // Defensive checks to prevent filter crashes
       if (!skin.contentTierUuid || !skin.displayIcon) return false;
 
       const name = skin.displayName?.toLowerCase() || "";
       const path = skin.assetPath?.toLowerCase() || "";
       const isMelee = skin.category === "Melee" || path.includes("melee");
 
-      // Strict Exclusions
-      if (path.includes("battlepass") || path.includes("season")) return false;
-      if (name.includes("champions") || name.includes("arcane") || name.includes("vct")) return false;
+      // Strict Exclusions (Battle Pass Beta-2026, Limited, Ultra)
+      if (path.includes("battlepass") || path.includes("season") || path.includes("episode")) return false;
+      if (name.includes("champions") || name.includes("arcane") || name.includes("vct") || name.includes("ignite")) return false;
       if (skin.contentTierUuid === ULTRA) return false;
       if (skin.contentTierUuid === EXCLUSIVE && !isMelee) return false;
 
       return [SELECT, DELUXE, PREMIUM, EXCLUSIVE].includes(skin.contentTierUuid);
     });
 
-    // FIX 2: Fallback Pool System[cite: 7]
+    // FALLBACK: If over-filtering results in 0, use a general pool
     let pool = filtered.length > 0 ? filtered : allSkins.filter(s => s.displayIcon && s.contentTierUuid);
     
     setMarketSkins(pool.sort(() => 0.5 - Math.random()).slice(0, 6));
@@ -44,7 +44,7 @@ const Nightmarket = ({ allSkins, onBack, bgmVolume, sfxVolume, onBgmChange, onSf
       <div className="nm-overlay">
         <div className="nm-top-bar">
           <button className="tactical-btn" onClick={onBack} onMouseEnter={onHover}>◄ BACK</button>
-          <div className="nm-volume-box">
+          <div className="nm-vol-box">
              <div className="vol-item"><span className="vol-label">SFX</span>
                <input type="range" min="0" max="1" step="0.01" value={sfxVolume} onChange={(e) => onSfxChange(e.target.value)} className="tactical-slider" />
              </div>
@@ -53,7 +53,6 @@ const Nightmarket = ({ allSkins, onBack, bgmVolume, sfxVolume, onBgmChange, onSf
              </div>
           </div>
         </div>
-
         <h1 className="nm-title">NIGHT.MARKET</h1>
         <div className="nm-grid">
           {loading ? (
@@ -75,11 +74,11 @@ const NMCard = ({ skin }) => {
   
   const getTier = () => {
     const path = skin.assetPath?.toLowerCase() || "";
-    if (path.includes("melee") || skin.category === "Melee") return "exclusive";
+    if (path.includes("melee") || skin.category === "Melee") return "exclusive"; // Gold
     switch(skin.contentTierUuid) {
-      case "12683d76-48d7-84a3-4e09-69857a424b33": return "select";  
-      case "3b62c16e-440d-327c-264d-910408542c16": return "deluxe"; 
-      default: return "premium"; 
+      case "12683d76-48d7-84a3-4e09-69857a424b33": return "select";  // Blue
+      case "3b62c16e-440d-327c-264d-910408542c16": return "deluxe"; // Green
+      default: return "premium"; // Magenta
     }
   };
 
