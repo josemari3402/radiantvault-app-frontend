@@ -6,33 +6,38 @@ const Nightmarket = ({ allSkins, onBack, bgmVolume, sfxVolume, onBgmChange, onSf
   const [marketSkins, setMarketSkins] = useState([]);
 
   useEffect(() => {
+    // Official Tier UUIDs[cite: 3]
     const SELECT = "12683d76-48d7-84a3-4e09-69857a424b33";
     const DELUXE = "3b62c16e-440d-327c-264d-910408542c16";
     const PREMIUM = "d1548d44-4b3a-cc5b-86d7-73d84a7e9373";
     const EXCLUSIVE = "e0468541-403c-e400-3051-444772186842";
     const ULTRA = "0cebb8be-46d7-c12a-d306-e9907ad5a0a1";
 
-    if (!allSkins || allSkins.length === 0) {
-      console.log("NM WAIT: allSkins is empty, waiting for data...");
-      return;
-    }
+    if (allSkins.length === 0) return;
 
     const filtered = allSkins.filter(skin => {
+      // Safety Guards
       if (!skin.assetPath || !skin.tierUuid) return false;
+
       const path = skin.assetPath.toLowerCase();
-      const name = skin.displayName?.toLowerCase() || "";
+      const name = skin.name.toLowerCase();
       const isMelee = skin.category === "Melee";
 
-      // RESEARCH-BASED EXCLUSIONS[cite: 4]
-      if (path.includes("battlepass") || path.includes("season") || path.includes("episode")) return false;
+      // 1. EXCLUDE BATTLEPASS (All Seasons/Beta)
+      if (path.includes("battlepass") || path.includes("season")) return false;
+
+      // 2. EXCLUDE LIMITED AND ULTRA[cite: 4]
       if (name.includes("champions") || name.includes("arcane") || name.includes("vct") || name.includes("ignite")) return false;
       if (skin.tierUuid === ULTRA) return false;
+
+      // 3. EXCLUDE EXCLUSIVE GUNS (BUT ALLOW MELEE)[cite: 4]
       if (skin.tierUuid === EXCLUSIVE && !isMelee) return false;
 
+      // 4. ALLOW ONLY ELIGIBLE TIERS[cite: 4]
       return [SELECT, DELUXE, PREMIUM, EXCLUSIVE].includes(skin.tierUuid);
     });
 
-    console.log(`NM READY: Found ${filtered.length} eligible skins.`);
+    console.log(`Night Market Pool Calibrated: ${filtered.length} eligible skins.`);
     setMarketSkins(filtered.sort(() => 0.5 - Math.random()).slice(0, 6));
   }, [allSkins]);
 
@@ -42,14 +47,15 @@ const Nightmarket = ({ allSkins, onBack, bgmVolume, sfxVolume, onBgmChange, onSf
         <div className="nm-top-bar">
           <button className="tactical-btn" onClick={onBack} onMouseEnter={onHover}>◄ BACK</button>
           <div className="nm-vol-box">
-             <div className="vol-item"><span className="vol-label">SFX</span>
-               <input type="range" min="0" max="1" step="0.01" value={sfxVolume} onChange={(e) => onSfxChange(e.target.value)} />
-             </div>
-             <div className="vol-item"><span className="vol-label">AUDIO</span>
-               <input type="range" min="0" max="1" step="0.01" value={bgmVolume} onChange={(e) => onBgmChange(e.target.value)} />
-             </div>
+            <div className="vol-item"><span className="vol-label">SFX</span>
+              <input type="range" min="0" max="1" step="0.01" value={sfxVolume} onChange={(e) => onSfxChange(e.target.value)} className="tactical-slider" />
+            </div>
+            <div className="vol-item"><span className="vol-label">AUDIO</span>
+              <input type="range" min="0" max="1" step="0.01" value={bgmVolume} onChange={(e) => onBgmChange(e.target.value)} className="tactical-slider" />
+            </div>
           </div>
         </div>
+
         <h1 className="nm-title">NIGHT.MARKET</h1>
         <div className="nm-grid">
           {marketSkins.length > 0 ? (
@@ -65,10 +71,18 @@ const Nightmarket = ({ allSkins, onBack, bgmVolume, sfxVolume, onBgmChange, onSf
 
 const NMCard = ({ skin }) => {
   const [flipped, setFlipped] = useState(false);
-  const [discount] = useState(Math.floor(Math.random() * 41) + 10);
-  const tier = (skin.category === "Melee") ? "exclusive" : 
-               (skin.tierUuid === "12683d76-48d7-84a3-4e09-69857a424b33") ? "select" :
-               (skin.tierUuid === "3b62c16e-440d-327c-264d-910408542c16") ? "deluxe" : "premium";
+  const [discount] = useState(Math.floor(Math.random() * 40) + 10);
+  
+  const getTier = () => {
+    if (skin.category === "Melee") return "exclusive"; // Gold
+    switch(skin.tierUuid) {
+      case "12683d76-48d7-84a3-4e09-69857a424b33": return "select";  // Blue[cite: 8]
+      case "3b62c16e-440d-327c-264d-910408542c16": return "deluxe";  // Green[cite: 8]
+      default: return "premium"; // Magenta[cite: 8]
+    }
+  };
+
+  const tier = getTier();
 
   return (
     <div className={`nm-card ${flipped ? 'flipped' : ''}`} onClick={() => setFlipped(true)}>
@@ -77,8 +91,8 @@ const NMCard = ({ skin }) => {
         <div className={`nm-back tier-bg-${tier}`}>
           <div className="nm-discount">-{discount}%</div>
           <div className="nm-price">{Math.floor(1775 * (1 - discount/100))} VP</div>
-          <div className="nm-img-box"><img src={skin.displayIcon} className="nm-gun" alt="" /></div>
-          <div className="nm-info"><h4>{skin.displayName}</h4></div>
+          <div className="nm-img-box"><img src={skin.image} className="nm-gun" alt="" /></div>
+          <div className="nm-info"><h4>{skin.name}</h4></div>
         </div>
       </div>
     </div>
