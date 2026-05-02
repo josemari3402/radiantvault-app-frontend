@@ -1,4 +1,4 @@
-/* CONTAINER & OVERLAY */
+/* 1. CONTAINER & OVERLAY LAYOUT */
 .nm-container {
   width: 100vw;
   height: 100vh;
@@ -6,7 +6,7 @@
   background-position: center;
   background-color: #0f1923;
   position: relative;
-  overflow: hidden;
+  overflow: hidden; /* Prevents scrollbars if cards rotate slightly out of bounds */
 }
 
 .nm-overlay {
@@ -16,10 +16,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 140px;
+  padding-top: 140px; /* Space for the large title */
 }
 
-/* TOP BAR (Z-INDEX FIX) */
+/* 2. TOP BAR & BUTTON INTERACTION */
 .nm-top-bar {
   position: absolute;
   top: 60px;
@@ -28,13 +28,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  z-index: 999; /* Ensure buttons are clickable */
+  z-index: 1000; /* Extremely high to ensure SHUFFLE is never blocked by overlays */
 }
 
 .nm-btn-group {
   display: flex;
   gap: 15px;
-  pointer-events: auto; /* Force input acceptance */
+  pointer-events: auto; /* Ensures mouse clicks are registered */
 }
 
 .tactical-btn {
@@ -46,67 +46,163 @@
   clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
   cursor: pointer !important;
   font-size: 0.9rem;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
 }
 
-.tactical-btn:hover { background: white; color: #ff4655; }
-.shuffle-btn { background: #0f1923; border: 1px solid #ff4655; color: #ff4655; }
+.tactical-btn:hover {
+  background: white;
+  color: #ff4655;
+  transform: scale(1.05);
+}
 
-/* HORIZONTAL GRID (FLEX-ROW) */
-.nm-grid-row {
+.shuffle-btn {
+  background: #0f1923;
+  border: 1px solid #ff4655;
+  color: #ff4655;
+}
+
+/* 3. HORIZONTAL GRID SYSTEM */
+.nm-horizontal-row {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
   gap: 12px;
   width: 98%;
-  perspective: 1500px;
+  perspective: 1500px; /* Required for the 3D flip effect */
   margin-top: 20px;
 }
 
-/* CARD DIMENSIONS (FOR 6 IN A ROW) */
+/* 4. CARD DIMENSIONS & CLIPPING FIXES */
 .nm-card {
-  width: 185px;
+  width: 185px; /* Narrowed to fit 6 in a single horizontal row */
   height: 290px;
   cursor: pointer;
   position: relative;
   transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   transform-style: preserve-3d;
+  overflow: hidden; /* CRITICAL: Prevents gun barrels from overlapping neighboring cards */
 }
 
-.nm-card.flipped { transform: rotateY(180deg); }
+.nm-card.flipped {
+  transform: rotateY(180deg);
+}
 
-.nm-card-inner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; }
+.nm-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
 
 .nm-front, .nm-back {
-  position: absolute; width: 100%; height: 100%;
-  backface-visibility: hidden; border: 2px solid rgba(255, 255, 255, 0.1);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
-.nm-front { background: #101823; display: flex; align-items: center; justify-content: center; }
-.nm-diamond { width: 40px; height: 40px; background: #ece8e1; transform: rotate(45deg); opacity: 0.15; }
+.nm-front {
+  background: #101823;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-/* TIER COLORS */
-.tier-border-select { border-color: #5a9fe2; }
-.tier-border-deluxe { border-color: #00adaa; }
-.tier-border-premium { border-color: #d1548d; }
-.tier-border-exclusive { border-color: #ffad5c; }
+.nm-diamond {
+  width: 40px;
+  height: 40px;
+  background: #ece8e1;
+  transform: rotate(45deg);
+  opacity: 0.15;
+}
+
+/* 5. CARD BACK CONTENT & WEAPON SCALING */
+.nm-back {
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  overflow: hidden; /* Double safety for image clipping */
+}
+
+.nm-discount {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  color: #ff4655;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.nm-price {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.8rem;
+}
+
+.nm-img-box {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+/* DEFAULT GUN SCALING (Rifles, Snipers) */
+.nm-gun {
+  max-width: 170%; 
+  transform: rotate(-35deg);
+  filter: drop-shadow(0 0 10px rgba(0,0,0,0.7));
+  transition: max-width 0.3s ease;
+}
+
+/* CUSTOM SCALING FOR SMALLER WEAPONS */
+.nm-sidearm-size {
+  max-width: 115% !important; /* Zooms out sidearms so they don't clip */
+}
+
+.nm-melee-size {
+  max-width: 100% !important; /* Zooms out knives to fit the frame */
+}
+
+.nm-info h4 {
+  font-family: 'Anton', sans-serif;
+  font-size: 0.75rem;
+  color: #ece8e1;
+  text-transform: uppercase;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+/* 6. RESEARCHED TIER COLORS */
+.tier-border-select { border-color: #5a9fe2; }    /* Blue */
+.tier-border-deluxe { border-color: #00adaa; }    /* Green */
+.tier-border-premium { border-color: #d1548d; }   /* Magenta */
+.tier-border-exclusive { border-color: #ffad5c; } /* Gold/Orange */
 
 .tier-bg-select { background: linear-gradient(180deg, #101823, #1e364d); }
 .tier-bg-deluxe { background: linear-gradient(180deg, #101823, #004d4b); }
 .tier-bg-premium { background: linear-gradient(180deg, #101823, #4d1e36); }
 .tier-bg-exclusive { background: linear-gradient(180deg, #101823, #5c3b1e); }
 
-/* CARD BACK CONTENT */
-.nm-back { transform: rotateY(180deg); display: flex; flex-direction: column; padding: 15px; }
+/* 7. MISC UI ELEMENTS */
+.nm-title {
+  font-family: 'Anton', sans-serif;
+  font-size: 8rem;
+  color: #ece8e1;
+  margin: 0 0 40px;
+  opacity: 0.95;
+  pointer-events: none; /* Prevents the title from blocking mouse clicks */
+}
 
-.nm-discount { position: absolute; top: 10px; left: 10px; color: #ff4655; font-weight: bold; font-size: 1.2rem; }
-.nm-price { position: absolute; top: 12px; right: 12px; color: rgba(255, 255, 255, 0.8); font-size: 0.8rem; }
-
-.nm-img-box { flex-grow: 1; display: flex; align-items: center; justify-content: center; overflow: visible; }
-.nm-gun { max-width: 170%; transform: rotate(-35deg); filter: drop-shadow(0 0 10px rgba(0,0,0,0.7)); }
-
-.nm-info h4 { font-family: 'Anton', sans-serif; font-size: 0.75rem; color: #ece8e1; text-transform: uppercase; margin: 0; }
-
-.nm-title { font-family: 'Anton', sans-serif; font-size: 8rem; color: #ece8e1; margin: 0 0 40px; opacity: 0.95; pointer-events: none; }
-.nm-status { color: #ece8e1; font-family: 'Anton', sans-serif; font-size: 1.5rem; letter-spacing: 4px; }
+.nm-status {
+  color: #ece8e1;
+  font-family: 'Anton', sans-serif;
+  font-size: 1.5rem;
+  letter-spacing: 4px;
+}
