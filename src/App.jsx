@@ -14,7 +14,7 @@ import gridHoverSFX from './assets/gun-grid-hover.mp3';
 import gridSelectSFX from './assets/gun-grid-select.mp3';
 import variantSelectSFX from './assets/variant-select.mp3';
 
-const API_BASE_URL = 'https://radiantvault-loadoutlab.azurewebsites.net/api';
+const API_BASE_URL = 'http://localhost:5000/api';
 
 function App() {
   const [inLab, setInLab] = useState(false);

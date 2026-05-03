@@ -3,7 +3,6 @@ import axios from 'axios';
 import './LoadoutLab.css';
 import labBG from '../assets/background2.png';
 
-// WEAPON_LAYOUT: Bandit and Sheriff have been swapped in Column 1
 const WEAPON_LAYOUT = [
   { col: 1, sections: [{ label: "SIDEARMS", guns: ["Classic", "Shorty", "Frenzy", "Ghost", "Bandit", "Sheriff"] }] },
   { col: 2, sections: [{ label: "SMGS", guns: ["Stinger", "Spectre"] }, { label: "SHOTGUNS", guns: ["Bucky", "Judge"] }] },
@@ -23,10 +22,8 @@ const LoadoutLab = ({
   const [activeWeapon, setActiveWeapon] = useState(null);
   const [previewSkin, setPreviewSkin] = useState(null);
   const [activeIcon, setActiveIcon] = useState('');
-  
   const [selectedCard, setSelectedCard] = useState(initialLoadout?.equippedCard || null);
   const [selectedTitle, setSelectedTitle] = useState(initialLoadout?.equippedTitle || null);
-  
   const [showPicker, setShowPicker] = useState(null);
   const [loading, setLoading] = useState(true);
   const [skinSearch, setSkinSearch] = useState('');
@@ -45,7 +42,6 @@ const LoadoutLab = ({
         setWeapons(w.data.data);
         setCards(c.data.data);
         setTitles(t.data.data.filter(title => title.displayName));
-        
         if (!selectedCard) {
           const defaultCard = c.data.data.find(card => card.displayName.includes("Wide")) || c.data.data[0];
           setSelectedCard(defaultCard);
@@ -90,7 +86,10 @@ const LoadoutLab = ({
 
   return (
     <div className="lab-interface" style={{ backgroundImage: `url(${labBG})` }}>
-      <button className="tactical-btn logout-pos" onClick={onLogout} onMouseEnter={onHover}>LOGOUT ✕</button>
+      {/* 1. Logout removed from selection view */}
+      {view === 'grid' && (
+        <button className="tactical-btn logout-pos" onClick={onLogout} onMouseEnter={onHover}>LOGOUT ✕</button>
+      )}
 
       <div className="top-nav-controls">
         <div className="lab-volume-box">
@@ -110,47 +109,25 @@ const LoadoutLab = ({
           <div className="picker-content" onClick={e => e.stopPropagation()}>
             <div className="picker-header-row">
               <div className="picker-search-container">
-                <input 
-                  type="text" 
-                  placeholder={showPicker === 'cards' ? "SEARCH CARDS..." : "SEARCH TITLES..."} 
-                  className="picker-search-bar"
+                <input type="text" placeholder={showPicker === 'cards' ? "SEARCH CARDS..." : "SEARCH TITLES..."} className="picker-search-bar"
                   value={showPicker === 'cards' ? cardSearch : titleSearch}
                   onChange={(e) => showPicker === 'cards' ? setCardSearch(e.target.value) : setTitleSearch(e.target.value)}
-                  onMouseEnter={onHover} 
-                  onClick={onChoose}    
-                />
+                  onMouseEnter={onHover} onClick={onChoose} />
               </div>
               <div className="hover-name-display">{showPicker === 'cards' ? hoveredCardName : ''}</div>
               <h2 className="picker-header-text">SELECT {showPicker === 'cards' ? 'CARD' : 'TITLE'}</h2>
             </div>
-
             <div className={showPicker === 'cards' ? "fixed-card-grid" : "fixed-title-grid"}>
               {showPicker === 'cards' ? 
                 getFilteredCards().map(c => (
-                  <div 
-                    key={c.uuid} 
-                    className="card-selection-box" 
-                    onMouseEnter={() => { onHover(); setHoveredCardName(c.displayName.toUpperCase()); }}
-                    onMouseLeave={() => setHoveredCardName('')}
-                    onClick={() => { 
-                      onChoose(); 
-                      setSelectedCard(c); 
-                      onSave({ ...equippedSkins, equippedCard: c, equippedTitle: selectedTitle });
-                      setShowPicker(null); setCardSearch(''); setHoveredCardName(''); 
-                    }}
-                  >
+                  <div key={c.uuid} className="card-selection-box" onMouseEnter={() => { onHover(); setHoveredCardName(c.displayName.toUpperCase()); }} onMouseLeave={() => setHoveredCardName('')}
+                    onClick={() => { onChoose(); setSelectedCard(c); onSave({ ...equippedSkins, equippedCard: c, equippedTitle: selectedTitle }); setShowPicker(null); setCardSearch(''); setHoveredCardName(''); }}>
                     <img src={c.largeArt} className="card-selection-asset" alt="" />
                   </div>
                 )) :
                 getFilteredTitles().map(t => (
                   <div key={t.uuid} className="title-selection-box" onMouseEnter={onHover} 
-                    onClick={() => { 
-                      onChoose(); 
-                      setSelectedTitle(t); 
-                      onSave({ ...equippedSkins, equippedCard: selectedCard, equippedTitle: t });
-                      setShowPicker(null); 
-                      setTitleSearch('');
-                    }}>
+                    onClick={() => { onChoose(); setSelectedTitle(t); onSave({ ...equippedSkins, equippedCard: selectedCard, equippedTitle: t }); setShowPicker(null); setTitleSearch(''); }}>
                     {t.displayName.replace(/ Title/g, '')}
                   </div>
                 ))
@@ -175,12 +152,8 @@ const LoadoutLab = ({
                         const eq = equippedSkins[data.uuid];
                         return (
                           <div key={gunName} className="gun-slot-card" onMouseEnter={onHover} onClick={() => { 
-                            onChoose(); 
-                            setActiveWeapon(data); 
-                            const initialSkin = eq || data.skins[0];
-                            setPreviewSkin(initialSkin);
-                            setActiveIcon(initialSkin.fullRender || initialSkin.displayIcon);
-                            setView('customize'); 
+                            onChoose(); setActiveWeapon(data); const initialSkin = eq || data.skins[0];
+                            setPreviewSkin(initialSkin); setActiveIcon(initialSkin.fullRender || initialSkin.displayIcon); setView('customize'); 
                           }}>
                             <div className="gun-frame-box">
                               <img src={eq?.displayIcon || data.displayIcon} className="gun-icon-stable" alt={gunName} />
@@ -195,7 +168,6 @@ const LoadoutLab = ({
               </div>
             ))}
           </div>
-
           <aside className="sidebar-section">
             <div className="agent-card-frame" onMouseEnter={onHover} onClick={() => { onChoose(); setShowPicker('cards'); }}>
               <img src={selectedCard?.largeArt} className="full-fit-card" alt="" />
@@ -212,44 +184,37 @@ const LoadoutLab = ({
         <div className="customize-interface">
           <div className="cust-header-bar">
             <button className="tactical-btn" onClick={() => { onChoose(); setView('grid'); }} onMouseEnter={onHover}>◄ BACK</button>
-            <h1 className="skin-title-centered">{previewSkin?.displayName}</h1>
           </div>
+
+          <h1 className="skin-display-title-absolute">{previewSkin?.displayName}</h1>
+
           <div className="cust-body-layout">
             <aside className="skin-list-sidebar">
               <input type="text" placeholder="SEARCH SKINS..." className="skin-search-bar" value={skinSearch} 
                 onChange={(e) => setSkinSearch(e.target.value)} onMouseEnter={onHover} onClick={onChoose} />
               <div className="skin-grid-view">
-                {getFilteredSkins()
-                  .filter(s => s.displayName.toLowerCase().includes(skinSearch.toLowerCase()))
-                  .map(s => (
+                {getFilteredSkins().filter(s => s.displayName.toLowerCase().includes(skinSearch.toLowerCase())).map(s => (
                   <div key={s.uuid} className={`skin-slot-item ${previewSkin?.uuid === s.uuid ? 'active' : ''}`} 
-                    onMouseEnter={onGridHover} 
-                    onClick={() => { onGridSelect(); setPreviewSkin(s); setActiveIcon(s.fullRender || s.displayIcon); }}>
+                    onMouseEnter={onGridHover} onClick={() => { onGridSelect(); setPreviewSkin(s); setActiveIcon(s.fullRender || s.displayIcon); }}>
                     <img src={s.displayIcon || s.fullRender} className="sidebar-skin-img" alt="" />
                   </div>
                 ))}
               </div>
             </aside>
             <main className="preview-stage">
-              <div className="preview-limiter">
-                <img src={activeIcon} className="preview-hero-img" alt="" />
-              </div>
-
+              <div className="preview-limiter"><img src={activeIcon} className="preview-hero-img" alt="" /></div>
+              
               {previewSkin?.chromas && previewSkin.chromas.length > 1 && (
                 <div className="variant-strip">
                   {previewSkin.chromas.map((ch) => (
-                    <div 
-                      key={ch.uuid} 
-                      className={`variant-icon-wrapper ${activeIcon === (ch.fullRender || ch.displayIcon) ? 'active' : ''}`}
-                      onMouseEnter={onHover}
-                      onClick={() => { onVariantSelect(); setActiveIcon(ch.fullRender || ch.displayIcon || previewSkin.displayIcon); }}
-                    >
+                    <div key={ch.uuid} className={`variant-icon-wrapper ${activeIcon === (ch.fullRender || ch.displayIcon) ? 'active' : ''}`}
+                      onMouseEnter={onHover} onClick={() => { onVariantSelect(); setActiveIcon(ch.fullRender || ch.displayIcon || previewSkin.displayIcon); }}>
                       <img src={ch.swatch || ch.displayIcon} alt="" />
                     </div>
                   ))}
                 </div>
               )}
-
+              
               <button className="equip-btn-final" onClick={handleEquip} onMouseEnter={onHover}>EQUIP SKIN</button>
             </main>
           </div>

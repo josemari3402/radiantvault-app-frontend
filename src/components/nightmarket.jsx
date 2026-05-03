@@ -6,44 +6,64 @@ const Nightmarket = ({ allSkins, onBack, bgmVolume, sfxVolume, onBgmChange, onSf
   const [marketSkins, setMarketSkins] = useState([]);
   const [shuffleKey, setShuffleKey] = useState(0);
 
-  const generateOffers = useCallback(() => {
-    // Official Tier UUIDs
-    const SELECT = "12683d76-48d7-84a3-4e09-69857a424b33";
-    const DELUXE = "3b62c16e-440d-327c-264d-910408542c16";
-    const PREMIUM = "d1548d44-4b3a-cc5b-86d7-73d84a7e9373";
-    const EXCLUSIVE = "e0468541-403c-e400-3051-444772186842";
-    const ULTRA = "0cebb8be-46d7-c12a-d306-e9907ad5a0a1";
+  // Collection lists from image_19e5be.png
+  const ALLOWED_COLLECTIONS = {
+    SELECT: ["Convex", "Daydreams", "Endeavour", "Fortune's Hand", "Galleria", "Infantry", "Intergrade", "Luxe", "Prism II", "Reverie", "Rupture", "Rush", "Sensation", "Smite", "Storm Maw", "Switchback", "Wonderstallion"],
+    DELUXE: ["Abyssal", "Altitude", "Aperture", "Aristocrat", "Avalanche", "Chromedek", "Combat Crafts", "Emberclad", "Holomoku", "Horizon", "Jellybeam", "Kohaku & Matsuba", "Luna", "Minima", "MK.VII Liberty", "Nanomight", "NO LIMITS", "Nunca Olvidados", "Orion", "Prism", "Sakura", "Sarmad", "SilkLeaf", "Silvanus", "Snowfall", "Team Ace", "Tigris", "Titanmail", "VALORANT GO! Vol. 3", "Wasteland", "Winterwunderland"],
+    PREMIUM: ["Aemondir", "Black.Market", "Bolt", "Celestial", "Crimsonbeast", "Cryostasis", "Doodle Buds", "Ego", "Forsaken", "Gaia's Vengeance", "Gravitational Uranium Neuroblaster", "Helix", "Ion", "Magepunk", "Nebula", "Neptune", "Oni", "Origin", "Prime", "Prime//2.0", "Radiant Crisis 001", "Reaver", "Recon", "Solarstride", "Soulstrife", "Sovereign", "Spline", "Tethered Realms", "Undercity", "Valiant Hero", "VALORANT GO! Vol. 1", "VALORANT GO! Vol. 2", "Xenohunter", "XERØFANG"]
+  };
 
+  // Base Prices from image_19e1de.png
+  const TIER_PRICES = {
+    SELECT: { gun: 875, melee: 1750 },
+    DELUXE: { gun: 1275, melee: 2550 },
+    PREMIUM: { gun: 1775, melee: 3550 }
+  };
+
+  const generateOffers = useCallback(() => {
     if (!allSkins || allSkins.length === 0) return;
 
-    const filtered = allSkins.filter(skin => {
-      const path = skin.assetPath?.toLowerCase() || "";
-      const name = skin.displayName?.toLowerCase() || "";
-      const isMelee = path.includes("melee") || skin.category === "Melee";
-
-      // Strict Exclusions: Battle Pass (Beta to 2026), Limited, Ultra
-      if (path.includes("battlepass") || path.includes("season") || path.includes("episode")) return false;
-      if (name.includes("champions") || name.includes("arcane") || name.includes("vct") || name.includes("ignite")) return false;
-      if (skin.contentTierUuid === ULTRA) return false;
-      if (skin.contentTierUuid === EXCLUSIVE && !isMelee) return false;
-
-      return [SELECT, DELUXE, PREMIUM, EXCLUSIVE].includes(skin.contentTierUuid);
+    // Filter strictly by the allowed collections[cite: 3]
+    const eligible = allSkins.filter(skin => {
+      const name = skin.displayName || "";
+      return ALLOWED_COLLECTIONS.SELECT.some(c => name.includes(c)) ||
+             ALLOWED_COLLECTIONS.DELUXE.some(c => name.includes(c)) ||
+             ALLOWED_COLLECTIONS.PREMIUM.some(c => name.includes(c));
     });
 
-    // Fallback if filters are too aggressive
-    const pool = filtered.length >= 6 ? filtered : allSkins.filter(s => s.displayIcon && s.contentTierUuid);
-    const selection = pool.sort(() => 0.5 - Math.random()).slice(0, 6);
+    if (eligible.length === 0) return;
+
+    // Randomize and slice 6[cite: 3]
+    const selection = eligible.sort(() => 0.5 - Math.random()).slice(0, 6).map(skin => {
+      const name = skin.displayName;
+      const isMelee = name.includes("Melee") || name.includes("Knife") || name.includes("Axe") || 
+                      name.includes("Blade") || name.includes("Dagger") || name.includes("Karambit");
+      
+      let tier = "PREMIUM";
+      if (ALLOWED_COLLECTIONS.SELECT.some(n => name.includes(n))) tier = "SELECT";
+      else if (ALLOWED_COLLECTIONS.DELUXE.some(n => name.includes(n))) tier = "DELUXE";
+
+      const discount = Math.floor(Math.random() * 31) + 10;
+      const base = isMelee ? TIER_PRICES[tier].melee : TIER_PRICES[tier].gun;
+
+      return {
+        ...skin,
+        tierKey: tier,
+        isMelee,
+        marketDiscount: discount,
+        finalPrice: Math.floor(base * (1 - discount / 100))
+      };
+    });
+
     setMarketSkins(selection);
   }, [allSkins]);
 
-  useEffect(() => {
-    generateOffers();
-  }, [generateOffers]);
+  useEffect(() => { generateOffers(); }, [generateOffers, allSkins]);
 
   const handleShuffle = (e) => {
-    e.stopPropagation(); 
-    if (onChoose) onChoose(); // Restore Choose SFX for Shuffle
-    setShuffleKey(prev => prev + 1); 
+    e.stopPropagation();
+    if (onChoose) onChoose(); // Sound Fixed[cite: 3]
+    setShuffleKey(prev => prev + 1);
     generateOffers();
   };
 
@@ -57,20 +77,21 @@ const Nightmarket = ({ allSkins, onBack, bgmVolume, sfxVolume, onBgmChange, onSf
           </div>
           <div className="nm-vol-box">
              <div className="vol-item"><span className="vol-label">SFX</span>
-               <input type="range" min="0" max="1" step="0.01" value={sfxVolume} onChange={(e) => onSfxChange(e.target.value)} />
+               <input type="range" min="0" max="1" step="0.01" value={sfxVolume} onChange={(e) => onSfxChange(e.target.value)} className="nm-slider" />
              </div>
              <div className="vol-item"><span className="vol-label">AUDIO</span>
-               <input type="range" min="0" max="1" step="0.01" value={bgmVolume} onChange={(e) => onBgmChange(e.target.value)} />
+               <input type="range" min="0" max="1" step="0.01" value={bgmVolume} onChange={(e) => onBgmChange(e.target.value)} className="nm-slider" />
              </div>
           </div>
         </div>
 
         <h1 className="nm-title">NIGHT.MARKET</h1>
         
-        {/* ShuffleKey forces cards to un-flip on shuffle */}
         <div className="nm-horizontal-row" key={shuffleKey}>
           {marketSkins.length > 0 ? (
-            marketSkins.map((skin, i) => <NMCard key={i} skin={skin} onHover={onHover} />)
+            marketSkins.map((skin, i) => (
+              <NMCard key={`${shuffleKey}-${i}`} skin={skin} onHover={onHover} onChoose={onChoose} />
+            ))
           ) : (
             <p className="nm-status">CALIBRATING OFFERS...</p>
           )}
@@ -80,34 +101,44 @@ const Nightmarket = ({ allSkins, onBack, bgmVolume, sfxVolume, onBgmChange, onSf
   );
 };
 
-const NMCard = ({ skin, onHover }) => {
+const NMCard = ({ skin, onHover, onChoose }) => {
   const [flipped, setFlipped] = useState(false);
-  const [discount] = useState(Math.floor(Math.random() * 31) + 10);
-  
-  const path = skin.assetPath?.toLowerCase() || "";
-  const isMelee = path.includes("melee") || skin.category === "Melee";
-  const isSidearm = skin.category === "Sidearm" || path.includes("sidearm");
 
-  const tier = isMelee ? "exclusive" : 
-               (skin.contentTierUuid === "12683d76-48d7-84a3-4e09-69857a424b33") ? "select" :
-               (skin.contentTierUuid === "3b62c16e-440d-327c-264d-910408542c16") ? "deluxe" : "premium";
+  const handleFlip = () => {
+    if (!flipped) {
+      if (onChoose) onChoose(); // Sound Fixed[cite: 3]
+      setFlipped(true);
+    }
+  };
+
+  // Tier Colors
+  const TIER_COLORS = {
+    SELECT: "#5a9fe2",
+    DELUXE: "#00adaa",
+    PREMIUM: "#d1548d",
+    GOLD: "#f1c964"
+  };
+
+  const currentGlow = skin.isMelee ? TIER_COLORS.GOLD : TIER_COLORS[skin.tierKey];
 
   return (
-    <div className={`nm-card ${flipped ? 'flipped' : ''}`} onClick={() => setFlipped(true)} onMouseEnter={() => !flipped && onHover()}>
+    <div className={`nm-card ${flipped ? 'flipped' : ''}`} onClick={handleFlip} onMouseEnter={() => !flipped && onHover()}>
       <div className="nm-card-inner">
-        <div className={`nm-front tier-border-${tier}`}><div className="nm-diamond"></div></div>
-        <div className={`nm-back tier-bg-${tier}`}>
-          <div className="nm-discount">-{discount}%</div>
-          <div className="nm-price">{Math.floor(1775 * (1 - discount/100))} VP</div>
+        {/* Front side */}
+        <div className="nm-front" style={{ borderColor: currentGlow, boxShadow: `0 0 20px ${currentGlow}` }}>
+          <div className="nm-diamond" style={{ background: currentGlow }}></div>
+        </div>
+        
+        {/* Back side */}
+        <div className={`nm-back tier-bg-${skin.isMelee ? 'gold' : skin.tierKey.toLowerCase()}`} style={{ borderColor: currentGlow, boxShadow: `0 0 20px ${currentGlow}` }}>
+          <div className="nm-discount">-{skin.marketDiscount}%</div>
           <div className="nm-img-box">
-            {/* Conditional classes to scale sidearms/knives differently */}
-            <img 
-              src={skin.displayIcon} 
-              className={`nm-gun ${isMelee ? 'nm-melee-size' : ''} ${isSidearm ? 'nm-sidearm-size' : ''}`} 
-              alt="" 
-            />
+            <img src={skin.displayIcon} className="nm-weapon-asset" alt="" />
           </div>
-          <div className="nm-info"><h4>{skin.displayName}</h4></div>
+          <div className="nm-footer">
+            <div className="nm-info"><h4>{skin.displayName}</h4></div>
+            <div className="nm-price">{skin.finalPrice} VP</div>
+          </div>
         </div>
       </div>
     </div>

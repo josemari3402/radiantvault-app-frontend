@@ -17,542 +17,133 @@
   cursor: pointer; z-index: 100; transition: 0.2s;
 }
 .tactical-btn:hover { background: white; color: #ff4655; box-shadow: 0 0 15px rgba(255, 70, 85, 0.6); }
+
 .logout-pos { position: absolute; top: 20px; right: 40px; }
 
-/* MAIN ARSENAL GRID */
+/* ARSENAL GRID */
 .main-lab-layout { display: flex; padding: 10vh 40px 20px 40px; gap: 25px; flex: 1; min-height: 0; }
 .arsenal-columns { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
 .white-cat-header { color: #ffffff; font-size: 14px; text-align: center; margin-bottom: 12px; letter-spacing: 2px; }
 
-/* BIGGER GUN FRAMES */
+/* GUN CARD ACTIONS */
+.gun-slot-card { cursor: pointer; transition: 0.3s; }
+.gun-slot-card:hover { transform: translateY(-4px); }
+
 .gun-frame-box {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  height: 85px; /* LOCKED HEIGHT */
-  display: flex; align-items: center; justify-content: center;
-  overflow: hidden;
+  background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.15);
+  height: 85px; display: flex; align-items: center; justify-content: center; overflow: hidden;
+  transition: 0.3s;
+}
+.gun-slot-card:hover .gun-frame-box { 
+  border-color: #ff4655; 
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 12px rgba(255, 70, 85, 0.5); 
 }
 .gun-icon-stable { max-width: 90%; max-height: 85%; object-fit: contain; transition: 0.3s; }
 .gun-slot-card:hover .gun-icon-stable { transform: scale(1.15); filter: brightness(1.1); }
-.gun-slot-card:hover .gun-frame-box { border-color: #ff4655; background: rgba(255,255,255,0.06); }
 .gun-name-label { font-size: 10px; color: #bbbbbb; margin-top: 5px; display: block; letter-spacing: 1px; }
 
-/* PLAYER PROFILE WITH BORDER */
+/* PLAYER PROFILE */
 .sidebar-section { width: 240px; }
 .agent-card-frame { 
-  position: relative; width: 100%; aspect-ratio: 1/2.2; 
-  cursor: pointer; border: 2px solid #ffffff; 
-  overflow: hidden; background: #000;
-  box-shadow: 0 0 15px rgba(255,255,255,0.1);
+  position: relative; 
+  width: 100%; 
+  /* Restore the original aspect ratio[cite: 1] */
+  aspect-ratio: 1/2.2; 
+  /* Push down to align top edge with Marshal's top frame[cite: 1] */
+  margin-top: 42px; 
+  cursor: pointer; 
+  border: 2px solid #ffffff; 
+  overflow: hidden; 
+  background: #000; 
+  box-shadow: 0 0 15px rgba(255,255,255,0.1); 
 }
+
 .full-fit-card { width: 100%; height: 100%; object-fit: cover; }
 .gold-name-strip { background: #f1c964; width: 100%; padding: 4px 0; display: flex; justify-content: center; }
-.gold-name-strip h2 { color: #111; font-size: 18px; margin: 0; }
-.gold-bar-anchor { position: absolute; bottom: 40px; width: 100%; display: flex; flex-direction: column; align-items: center; }
-.clean-title-display { color: white; font-size: 11px; margin-top: 6px; text-shadow: 0 1px 3px black; }
+.gold-name-strip h2 { color: #111; font-size: 18px; margin: 0; font-weight: bold; }
 
-/* --- MODAL PICKER RE-ENGINEERED --- */
-.picker-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; display: flex; align-items: center; justify-content: center; }
-.picker-content { width: 90%; height: 85vh; background: #0f1923; border: 1px solid #ff4655; padding: 35px; display: flex; flex-direction: column; overflow: hidden; }
-.picker-header { color: #ffffff; margin-bottom: 25px; font-size: 28px; letter-spacing: 3px; }
-
-/* THE "NO-STRIP" GRID */
-.fixed-card-grid {
-  display: grid;
-  grid-template-columns: repeat(13, 1fr); /* 13 columns as requested */
-  grid-auto-rows: min-content; /* CRITICAL: Prevents rows from squashing */
-  align-items: start; /* CRITICAL: Prevents vertical stretching/squashing */
-  gap: 10px; 
-  max-height: 70vh;
-  overflow-y: auto;
-  overflow-x: hidden; 
-  padding: 20px;
-  width: 100%;
-}
-
-.card-selection-box {
-  width: 100%;
-  cursor: pointer;
-  border: 2px solid transparent;
-  transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  background: #0f1923;
-}
-
-.card-selection-asset {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 27 / 64; /* Restores the tall player card shape */
-  display: block;
-  object-fit: cover;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.card-selection-box:hover {
-  border-color: #ff4655;
-  transform: scale(1.1) translateY(-5px);
-  z-index: 100;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 70, 85, 0.3);
-}
-
-/* TITLE PICKER */
-.fixed-title-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4 columns for titles looks cleaner */
-  grid-auto-rows: min-content; /* Prevents vertical stretching */
-  align-items: start;
-  gap: 15px;
-  max-height: 60vh;
-  overflow-y: auto;
-  padding: 10px;
-}
-
-.title-selection-box {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 70, 85, 0.2);
-  color: white;
-  font-family: 'Anton', sans-serif;
-  font-size: 14px;
-  padding: 15px;
-  text-align: center;
-  cursor: pointer;
-  transition: 0.2s;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.title-selection-box:hover {
-  background: #ff4655;
-  color: white;
-  transform: translateY(-2px);
-}
-
-/* CUSTOMIZE INTERFACE (CENTERED) */
-.customize-interface { flex: 1; background: rgba(0,0,0,0.95); display: flex; flex-direction: column; padding: 25px; min-height: 0; }
-.cust-header-bar { display: flex; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; position: relative; }
-.skin-title-centered { position: absolute; left: 50%; transform: translateX(-50%); color: white; font-size: 26px; }
-
-.cust-body-layout { display: flex; flex: 1; margin-top: 20px; overflow: hidden; width: 100%; }
-.skin-list-sidebar { width: 300px; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; }
-.skin-search-bar { background: rgba(255,255,255,0.05); border: 1px solid #333; color: white; padding: 12px; font-family: 'Anton'; }
-.skin-grid-view {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* Keeps your 2-column layout */
-  grid-auto-rows: min-content; /* Snaps the skins together vertically */
-  align-items: start;
-  gap: 10px;
-  overflow-y: auto;
-  max-height: 70vh; /* Adjust based on your screen layout */
-  padding-right: 5px;
-}
-
-.skin-slot-item {
-  width: 100%;
-  aspect-ratio: 16 / 9; /* Ensures guns don't look squashed */
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid #333;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  transition: 0.2s;
-  padding: 5px;
-}
-
-.skin-slot-item.active {
-  border-color: #00f2ff;
-  background: rgba(0, 242, 255, 0.1);
-}
-
-.skin-slot-item:hover {
-  background: rgba(255, 70, 85, 0.1);
-  border-color: #ff4655;
-}
-.sidebar-skin-img { max-width: 90%; max-height: 80%; object-fit: contain; }
-
-.preview-stage { 
-  flex: 1; 
+/* Original position for gold bar[cite: 1] */
+.gold-bar-anchor { 
+  position: absolute; 
+  bottom: 40px; 
+  width: 100%; 
   display: flex; 
   flex-direction: column; 
   align-items: center; 
-  justify-content: center; /* VERTICAL CENTERING */
 }
-.preview-limiter { width: 100%; display: flex; align-items: center; justify-content: center; max-height: 42vh; }
-.preview-hero-img { max-width: 80%; max-height: 100%; object-fit: contain; filter: drop-shadow(0 0 30px rgba(255,255,255,0.05)); }
-.equip-btn-final {
-  background: #ff4655;
-  color: white;
-  border: none;
-  padding: 15px 100px;
-  
-  /* THE FIX: Explicitly set the font and spacing */
-  font-family: 'Anton', sans-serif; 
-  font-size: 24px;
-  letter-spacing: 4px; /* Matches the tactical feel of the other buttons */
-  text-transform: uppercase;
-  
-  cursor: pointer;
-  clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
-  margin-top: 30px;
-  transition: 0.2s; /* Adds a smooth transition like the logout button */
-}
+.clean-title-display { color: white; font-size: 11px; margin-top: 6px; text-shadow: 0 1px 3px black; font-weight: bold; }
 
-/* Optional: Add a hover effect to match your other tactical buttons */
-.equip-btn-final:hover {
-  background: white;
-  color: #ff4655;
-  box-shadow: 0 0 20px rgba(255, 70, 85, 0.4);
-}
+/* MODAL PICKER[cite: 1] */
+.picker-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+.picker-content { width: 95vw; max-width: 1800px; height: 85vh; background: #0f1923; border: 1px solid #ff4655; padding: 40px; display: flex; flex-direction: column; overflow: hidden; }
+.fixed-card-grid { display: grid; grid-template-columns: repeat(13, 1fr); gap: 10px; max-height: 70vh; overflow-y: auto; padding: 20px; width: 100%; justify-content: center; }
+.card-selection-box { width: 100%; cursor: pointer; border: 2px solid transparent; background: #0f1923; }
+.card-selection-asset { width: 100%; aspect-ratio: 27 / 64; display: block; object-fit: cover; }
+.fixed-title-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; max-height: 60vh; overflow-y: auto; padding: 10px; }
+.title-selection-box { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 70, 85, 0.2); color: white; padding: 15px; text-align: center; cursor: pointer; }
 
-.picker-overlay {
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(4px);
-}
+/* CUSTOMIZE VIEW[cite: 1] */
+.customize-interface { flex: 1; background: rgba(0,0,0,0.95); display: flex; flex-direction: column; padding: 25px; min-height: 0; position: relative; }
+.cust-header-bar { display: flex; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; height: 60px; }
 
-.picker-content {
-  animation: pickerOpen 0.25s ease-out;
-}
-
-@keyframes pickerOpen {
-  from { transform: scale(0.95); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-.gun-slot-card:hover .gun-frame-box {
-  box-shadow: 0 0 12px rgba(255, 70, 85, 0.5);
-}
-
-.gun-slot-card:hover {
-  transform: translateY(-4px);
-}
-
-.gun-icon-stable {
-  object-fit: contain;
-  transform: translateY(3px);
-}
-
-.lab-interface > * {
-  animation: softFade 0.25s ease;
-}
-
-@keyframes softFade {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.username-input:focus {
-  box-shadow: 0 0 10px #ff4655;
-}
-
-.preview-hero-img {
-  filter: drop-shadow(0 0 40px rgba(255, 255, 255, 0.08));
-}
-.preview-hero-img:hover {
-  filter: drop-shadow(0 0 45px rgba(255, 70, 85, 0.2));
-  transform: scale(1.02);
-}
-
-.fixed-card-grid::-webkit-scrollbar,
-.fixed-title-grid::-webkit-scrollbar,
-.skin-grid-view::-webkit-scrollbar {
-  width: 4px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #ff4655;
-  border-radius: 2px;
-}
-
-.clean-title-display {
-  text-shadow: 0 2px 5px rgba(0,0,0,0.7);
-  font-weight: bold;
-}
-
-/* ... All previous Main Code styles remain UNTOUCHED ... */
-
-.variant-strip {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  margin: 15px 0;
-  background: rgba(0,0,0,0.4);
-  padding: 8px 15px;
-  border: 1px solid rgba(255,255,255,0.1);
-}
-
-.variant-icon-wrapper {
-  width: 38px;
-  height: 38px;
-  cursor: pointer;
-  background: #111;
-  border: 2px solid #333;
-  padding: 2px;
-  transition: 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.variant-icon-wrapper:hover {
-  border-color: #ff4655;
-  transform: translateY(-2px);
-}
-
-.variant-icon-wrapper.active {
-  border-color: #ff4655;
-  box-shadow: 0 0 10px rgba(255, 70, 85, 0.4);
-}
-
-.variant-icon-wrapper img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Maintain centering logic for the stage content[cite: 3] */
-.preview-stage {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Volume Slider Styles */
-.volume-control-box, .lab-volume-box {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-top: 25px;
-}
-
-.lab-volume-box {
+.skin-display-title-absolute {
   position: absolute;
-  top: 20px;
-  right: 180px; /* Positions it to the left of the Logout button */
-  margin-top: 0;
-  background: rgba(0, 0, 0, 0.4);
-  padding: 5px 15px;
-  border: 1px solid rgba(255, 70, 85, 0.3);
-}
-
-.vol-label {
-  color: #ff4655;
-  font-family: 'Anton', sans-serif;
-  font-size: 12px;
-  letter-spacing: 2px;
-}
-
-.tactical-slider {
-  appearance: none;         /* Standard property */
-  -webkit-appearance: none;  /* For Chrome and Safari */
-  -moz-appearance: none;     /* For Firefox */
-  width: 120px;
-  height: 4px;
-  background: #333;
-  outline: none;
-  cursor: pointer;
-}
-
-.tactical-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 12px;
-  height: 12px;
-  background: #ff4655;
-  cursor: pointer;
-  border-radius: 0; /* Square thumb for tactical look */
-  transition: 0.2s;
-}
-
-.tactical-slider::-webkit-slider-thumb:hover {
-  background: white;
-  box-shadow: 0 0 10px #ff4655;
-}
-
-.top-nav-controls {
-  position: relative;
-  z-index: 2000; /* Higher than the customize view and picker modals */
-  width: 100%;
-}
-
-.lab-volume-box {
-  position: absolute;
-  top: 20px;
-  right: 180px; 
-  z-index: 2001;
-  background: rgba(15, 25, 35, 0.8);
-  backdrop-filter: blur(4px);
-  padding: 5px 15px;
-  border: 1px solid rgba(255, 70, 85, 0.3);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-/* Ensure the logout button is also clickable */
-.logout-pos {
-  position: absolute;
-  top: 20px;
-  right: 40px;
-  z-index: 2001;
-}
-
-.cust-header-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* Pushes volume to the right */
-  border-bottom: 1px solid #333;
-  padding-bottom: 15px;
-  position: relative;
-}
-
-.cust-volume-inline {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-right: 150px; /* Leaves space so it doesn't hit the Logout button */
-}
-
-/* Dual Volume Layout */
-.dual-volume-container, .lab-volume-box {
-  display: flex;
-  gap: 30px;
-  align-items: center;
-}
-
-.vol-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-/* Standardization Fix (No more yellow line) */
-.tactical-slider {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  width: 100px;
-  height: 4px;
-  background: #333;
-  outline: none;
-  cursor: pointer;
-}
-
-.lab-volume-box {
-  position: absolute;
-  top: 20px;
-  right: 180px; 
-  background: rgba(15, 25, 35, 0.8);
-  backdrop-filter: blur(4px);
-  padding: 5px 20px;
-  border: 1px solid rgba(255, 70, 85, 0.3);
-}
-
-/* Ensuring font weights are preserved as bold/Anton */
-.gold-name-strip h2 {
-  font-weight: bold; /* Keeping original thickness */
-}
-
-.clean-title-display {
-  font-weight: bold; /* Keeping original thickness */
-}
-
-/* Picker UI Enhancements */
-.picker-header-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 0 20px 20px 20px;
-  border-bottom: 1px solid rgba(255, 70, 85, 0.2);
-  margin-bottom: 20px;
-  position: relative;
-  min-height: 60px;
-}
-
-.picker-search-container {
-  flex: 1;
-  display: flex;
-  justify-content: flex-start;
-}
-
-.picker-search-bar {
-  background: rgba(15, 25, 35, 0.9);
-  border: 1px solid #383e42;
-  padding: 10px 15px;
-  width: 250px;
-  color: white;
-  font-family: 'Anton', sans-serif;
-  font-size: 14px;
-  letter-spacing: 2px;
-  outline: none;
-  transition: 0.2s;
-}
-
-.picker-search-bar:focus {
-  border-color: #ff4655;
-  box-shadow: 0 0 10px rgba(255, 70, 85, 0.2);
-}
-
-.hover-name-display {
-  position: absolute;
+  top: 90px;
   left: 50%;
   transform: translateX(-50%);
+  color: white;
   font-family: 'Anton', sans-serif;
-  color: #ff4655;
-  font-size: 32px; /* Slightly larger for better impact */
-  letter-spacing: 6px;
-  text-shadow: 0 0 20px rgba(255, 70, 85, 0.6);
+  font-size: 42px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin: 0;
   pointer-events: none;
   z-index: 10;
-}
-.picker-header-text {
-  flex: 1;
-  text-align: right;
-  font-family: 'Anton', sans-serif;
-  color: white;
-  font-size: 24px;
-  letter-spacing: 3px;
-  margin: 0;
-  opacity: 0.8;
+  text-shadow: 0 0 20px rgba(0,0,0,0.9);
 }
 
-.picker-header-text.centered {
-  text-align: center;
-}
+.cust-body-layout { display: flex; flex: 1; margin-top: 20px; overflow: hidden; width: 100%; }
+.skin-list-sidebar { width: 300px; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; }
+.skin-search-bar { background: rgba(255,255,255,0.05); border: 1px solid #333; color: white; padding: 12px; font-family: 'Anton'; outline: none; }
+.skin-grid-view { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; overflow-y: auto; max-height: 70vh; padding-right: 5px; }
 
-.fixed-card-grid {
-  display: grid;
-  grid-template-columns: repeat(13, 1fr); /* fixed 13 columns */
-  gap: 8px; /* slightly tighter gap to fit comfortably */
-  max-height: 65vh;
-  overflow-y: auto;
-  overflow-x: hidden; /* removes the horizontal scrollbar */
-  padding: 15px;
-  width: 100%;
-  justify-content: center;
-}
+/* SKIN GRID SIDEBAR[cite: 1] */
+.skin-slot-item { width: 100%; aspect-ratio: 16 / 9; background: rgba(0, 0, 0, 0.3); border: 1px solid #333; display: flex; justify-content: center; align-items: center; cursor: pointer; padding: 5px; transition: 0.3s; }
+.skin-slot-item:hover { transform: translateY(-4px); border-color: #ff4655; background: rgba(255, 70, 85, 0.1); box-shadow: 0 0 12px rgba(255, 70, 85, 0.5); }
+.skin-slot-item.active { border-color: #00f2ff; background: rgba(0, 242, 255, 0.1); box-shadow: 0 0 10px rgba(0, 242, 255, 0.3); }
+.sidebar-skin-img { max-width: 90%; max-height: 80%; object-fit: contain; transition: 0.3s; }
+.skin-slot-item:hover .sidebar-skin-img { transform: scale(1.15); filter: brightness(1.1); }
 
-.picker-content {
-  background: rgba(15, 25, 35, 0.98);
-  width: 95vw; 
-  max-width: 1800px;
-  padding: 40px;
-  border: 1px solid #ff4655;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 0 50px rgba(0, 0, 0, 1);
-}
+.preview-stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.preview-limiter { width: 100%; display: flex; align-items: center; justify-content: center; max-height: 40vh; }
+.preview-hero-img { max-width: 85%; max-height: 100%; object-fit: contain; filter: drop-shadow(0 0 40px rgba(255, 255, 255, 0.08)); }
 
-.category-title {
-  font-size: 1.8rem; /* Increased from the default */
-  text-transform: uppercase;
-  letter-spacing: 3px; /* Gives it that Valorant "menu" vibe */
-  margin-bottom: 20px;
-  color: #ece8e1; /* The classic off-white tactical color */
-}
+/* VARIANT SELECTION[cite: 1] */
+.variant-strip { display: flex; gap: 12px; justify-content: center; margin: 25px 0; background: rgba(0,0,0,0.4); padding: 10px 20px; border: 1px solid rgba(255,255,255,0.1); width: fit-content; }
+.variant-icon-wrapper { width: 42px; height: 42px; cursor: pointer; background: #111; border: 2px solid #333; padding: 2px; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+.variant-icon-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+.variant-icon-wrapper.active { border-color: #ff4655; box-shadow: 0 0 10px rgba(255, 70, 85, 0.4); }
+
+.equip-btn-final { background: #ff4655; color: white; border: none; padding: 15px 100px; font-family: 'Anton'; font-size: 24px; letter-spacing: 4px; text-transform: uppercase; cursor: pointer; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%); margin-top: 10px; }
+
+/* VOLUME / PICKER[cite: 1] */
+.lab-volume-box { position: absolute; top: 20px; right: 180px;
+   background: rgba(15, 25, 35, 0.8); 
+   backdrop-filter: blur(4px); 
+   padding: 5px 20px; 
+   border: 1px solid rgba(255, 70, 85, 0.3); 
+   display: flex; gap: 30px; 
+   align-items: center; 
+   z-index: 2001; 
+  }
+.vol-label { color: #ff4655; font-size: 12px; letter-spacing: 2px; }
+.tactical-slider { appearance: none; -webkit-appearance: none; width: 100px; height: 4px; background: #333; outline: none; cursor: pointer; }
+.tactical-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: #ff4655; border-radius: 0; }
+.picker-header-row { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 0 20px 20px 20px; border-bottom: 1px solid rgba(255, 70, 85, 0.2); margin-bottom: 20px; position: relative; min-height: 60px; }
+.picker-search-bar { background: rgba(15, 25, 35, 0.9); border: 1px solid #383e42; padding: 10px 15px; width: 250px; color: white; font-family: 'Anton'; font-size: 14px; letter-spacing: 2px; outline: none; }
+.hover-name-display { position: absolute; left: 50%; transform: translateX(-50%); font-family: 'Anton'; color: #ff4655; font-size: 32px; letter-spacing: 6px; text-shadow: 0 0 20px rgba(255, 70, 85, 0.6); pointer-events: none; }
+.picker-header-text { flex: 1; text-align: right; color: white; font-size: 24px; letter-spacing: 3px; opacity: 0.8; }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: #ff4655; border-radius: 2px; }
