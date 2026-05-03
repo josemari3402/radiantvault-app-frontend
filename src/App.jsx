@@ -64,7 +64,7 @@ function App() {
   }, [inLab, bgmVolume]);
 
   const handleAuth = async () => {
-    const endpoint = isSigningUp ? '/signup' : '/login';
+    const endpoint = isSigningUp ? '/api/signup' : '/api/login';
     try {
       const res = await axios.post(`${API_BASE_URL}${endpoint}`, { username, password });
       if (isSigningUp) {
@@ -87,7 +87,7 @@ function App() {
     }));
 
     try {
-      await axios.post(`${API_BASE_URL}/save-loadout`, {
+      await axios.post(`${API_BASE_URL}/api/save-loadout`, {
         username: currentUser.username, 
         loadout: newLoadout
       });
