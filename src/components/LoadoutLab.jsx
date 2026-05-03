@@ -31,6 +31,17 @@ const LoadoutLab = ({
   const [titleSearch, setTitleSearch] = useState('');
   const [hoveredCardName, setHoveredCardName] = useState('');
 
+  // FIX: Fallback logic for high-tier skins (Sovereign/Prime)
+  const getSkinImage = (skin) => {
+    if (!skin) return "";
+    // If the main icon exists, use it. If not, use the first chroma (default version)
+    if (skin.displayIcon) return skin.displayIcon;
+    if (skin.chromas && skin.chromas.length > 0) {
+      return skin.chromas[0].fullRender || skin.chromas[0].displayIcon;
+    }
+    return skin.fullRender || ""; 
+  };
+
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -75,7 +86,7 @@ const LoadoutLab = ({
   const getFilteredSkins = () => {
     if (!activeWeapon) return [];
     return activeWeapon.skins
-      .filter(s => (s.displayIcon || s.fullRender) && !s.displayName.includes('Standard') && !s.displayName.includes('Favorite'))
+      .filter(s => (s.displayIcon || s.fullRender || s.chromas?.[0]?.displayIcon) && !s.displayName.includes('Standard') && !s.displayName.includes('Favorite'))
       .sort((a, b) => a.displayName.localeCompare(b.displayName));
   };
 
@@ -86,7 +97,6 @@ const LoadoutLab = ({
 
   return (
     <div className="lab-interface" style={{ backgroundImage: `url(${labBG})` }}>
-      {/* 1. Logout removed from selection view */}
       {view === 'grid' && (
         <button className="tactical-btn logout-pos" onClick={onLogout} onMouseEnter={onHover}>LOGOUT ✕</button>
       )}
@@ -152,11 +162,16 @@ const LoadoutLab = ({
                         const eq = equippedSkins[data.uuid];
                         return (
                           <div key={gunName} className="gun-slot-card" onMouseEnter={onHover} onClick={() => { 
-                            onChoose(); setActiveWeapon(data); const initialSkin = eq || data.skins[0];
-                            setPreviewSkin(initialSkin); setActiveIcon(initialSkin.fullRender || initialSkin.displayIcon); setView('customize'); 
+                            onChoose(); setActiveWeapon(data); 
+                            const initialSkin = eq || data.skins[0];
+                            setPreviewSkin(initialSkin); 
+                            // FIX: Initialization uses fallback
+                            setActiveIcon(getSkinImage(initialSkin)); 
+                            setView('customize'); 
                           }}>
                             <div className="gun-frame-box">
-                              <img src={eq?.displayIcon || data.displayIcon} className="gun-icon-stable" alt={gunName} />
+                              {/* FIX: Use helper for dashboard icons[cite: 2] */}
+                              <img src={getSkinImage(eq) || data.displayIcon} className="gun-icon-stable" alt={gunName} />
                             </div>
                             <span className="gun-name-label">{gunName.toUpperCase()}</span>
                           </div>
@@ -195,8 +210,9 @@ const LoadoutLab = ({
               <div className="skin-grid-view">
                 {getFilteredSkins().filter(s => s.displayName.toLowerCase().includes(skinSearch.toLowerCase())).map(s => (
                   <div key={s.uuid} className={`skin-slot-item ${previewSkin?.uuid === s.uuid ? 'active' : ''}`} 
-                    onMouseEnter={onGridHover} onClick={() => { onGridSelect(); setPreviewSkin(s); setActiveIcon(s.fullRender || s.displayIcon); }}>
-                    <img src={s.displayIcon || s.fullRender} className="sidebar-skin-img" alt="" />
+                    onMouseEnter={onGridHover} onClick={() => { onGridSelect(); setPreviewSkin(s); setActiveIcon(getSkinImage(s)); }}>
+                    {/* FIX: Use helper for sidebar thumbnails[cite: 2] */}
+                    <img src={getSkinImage(s)} className="sidebar-skin-img" alt="" />
                   </div>
                 ))}
               </div>
@@ -208,7 +224,7 @@ const LoadoutLab = ({
                 <div className="variant-strip">
                   {previewSkin.chromas.map((ch) => (
                     <div key={ch.uuid} className={`variant-icon-wrapper ${activeIcon === (ch.fullRender || ch.displayIcon) ? 'active' : ''}`}
-                      onMouseEnter={onHover} onClick={() => { onVariantSelect(); setActiveIcon(ch.fullRender || ch.displayIcon || previewSkin.displayIcon); }}>
+                      onMouseEnter={onHover} onClick={() => { onVariantSelect(); setActiveIcon(ch.fullRender || ch.displayIcon || getSkinImage(previewSkin)); }}>
                       <img src={ch.swatch || ch.displayIcon} alt="" />
                     </div>
                   ))}
