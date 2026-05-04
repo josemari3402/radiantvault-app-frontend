@@ -34,12 +34,15 @@ const LoadoutLab = ({
   // FIX: Fallback logic for high-tier skins (Sovereign/Prime)
   const getSkinImage = (skin) => {
     if (!skin) return "";
-    // If the main icon exists, use it. If not, use the first chroma (default version)
-    if (skin.displayIcon) return skin.displayIcon;
+
+    // 1. If we manually equipped this skin, trust the displayIcon (it's our variant!)
+    if (skin.isEquipped && skin.displayIcon) return skin.displayIcon;
+
     if (skin.chromas && skin.chromas.length > 0) {
       return skin.chromas[0].fullRender || skin.chromas[0].displayIcon;
     }
-    return skin.fullRender || ""; 
+
+    return skin.displayIcon || skin.fullRender || "";
   };
 
   useEffect(() => {
@@ -73,7 +76,7 @@ const LoadoutLab = ({
     onChoose();
     const newLoadout = { 
       ...equippedSkins, 
-      [activeWeapon.uuid]: { ...previewSkin, displayIcon: activeIcon },
+      [activeWeapon.uuid]: { ...previewSkin, displayIcon: activeIcon, isEquipped: true },
       equippedCard: selectedCard,
       equippedTitle: selectedTitle
     };
@@ -218,14 +221,15 @@ const LoadoutLab = ({
               </div>
             </aside>
             <main className="preview-stage">
-              <div className="preview-limiter"><img src={activeIcon} className="preview-hero-img" alt="" /></div>
+              <div className="preview-limiter">
+                <img src={activeIcon} className="preview-hero-img" alt="Preview" /></div>
               
               {previewSkin?.chromas && previewSkin.chromas.length > 1 && (
                 <div className="variant-strip">
                   {previewSkin.chromas.map((ch) => (
                     <div key={ch.uuid} className={`variant-icon-wrapper ${activeIcon === (ch.fullRender || ch.displayIcon) ? 'active' : ''}`}
-                      onMouseEnter={onHover} onClick={() => { onVariantSelect(); setActiveIcon(ch.fullRender || ch.displayIcon || getSkinImage(previewSkin)); }}>
-                      <img src={ch.swatch || ch.displayIcon} alt="" />
+                      onMouseEnter={onHover} onClick={() => { onVariantSelect(); const variantImg = ch.fullRender || ch.displayIcon; setActiveIcon(variantImg || getSkinImage(previewSkin)); }}>
+                      <img src={ch.swatch || ch.displayIcon} alt="Variant" />
                     </div>
                   ))}
                 </div>

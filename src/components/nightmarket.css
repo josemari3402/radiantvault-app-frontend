@@ -1,3 +1,5 @@
+/* nightmarket.css */
+
 .nm-container {
   width: 100vw; height: 100vh;
   background-size: cover; background-position: center;
@@ -9,50 +11,85 @@
   display: flex; flex-direction: column; align-items: center; padding-top: 140px;
 }
 
-/* VOLUME SYNC[cite: 4] */
-.nm-vol-box {
-  position: absolute; top: 13px; right: 180px; 
-  background: rgba(15, 25, 35, 0.8); backdrop-filter: blur(4px);
-  padding: 5px 20px; border: 1px solid rgba(255, 70, 85, 0.3);
-  display: flex; gap: 30px; align-items: center; z-index: 2001;
+/* TOP BAR RE-ALIGNMENT */
+.nm-top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100px; 
+  pointer-events: none; /* This fixes the unclickable Vault/Nightmarket buttons */
+  z-index: 2001;
 }
 
-/* FIX: FORCED HORIZONTAL ROW[cite: 4] */
+.nm-btn-group {
+  position: absolute;
+  top: 29px;
+  left: 25px;
+  display: flex;
+  gap: 15px;
+  pointer-events: auto; /* Re-enables clicking for buttons */
+}
+
+.nm-vol-box {
+  position: absolute;
+  top: 20px;   /* Change this to move sliders up or down */
+  right: 180px; /* Change this to move sliders left or right */
+  display: flex;
+  gap: 30px;
+  background: rgba(15, 25, 35, 0.7);
+  padding: 5px 20px;
+  border: 1px solid rgba(255, 70, 85, 0.2);
+  backdrop-filter: blur(5px);
+  align-items: center;
+  pointer-events: auto; /* Re-enables clicking for sliders */
+}
+
+.vol-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.vol-label {
+  font-family: 'Anton', sans-serif;
+  color: #ff4655;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+}
+
+/* TACTICAL SLIDER SYNC (Match Loadout Lab) */
+.tactical-slider {
+  -webkit-appearance: none;
+  width: 100px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  outline: none;
+  cursor: pointer;
+}
+
+.tactical-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px;
+  height: 10px;
+  background: #ff4655;
+  border-radius: 0; /* Keeps the thumb square */
+  box-shadow: 0 0 10px #ff4655, 0 0 5px #ff4655; /* The intense red glow */
+  cursor: pointer;
+}
+
+/* HORIZONTAL ROW */
 .nm-horizontal-row {
   display: flex !important;
   flex-direction: row !important;
   justify-content: center;
-  align-items: center;
   gap: 20px;
   width: 100%;
   perspective: 2000px;
-  margin-top: 20px;
-  flex-wrap: nowrap; /* Prevents vertical stacking[cite: 4] */
+  margin-top: 30px;
 }
 
-/* FIX: GUN ADJUSTING TO FRAME[cite: 4] */
-.nm-img-box {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  margin-bottom: 20px;
-  padding: 15px; /* Creates an internal buffer[cite: 4] */
-  overflow: hidden; /* Prevents assets from leaking[cite: 4] */
-}
-
-.nm-weapon-asset {
-  max-width: 100%; /* Gun shrinks to fit frame width[cite: 4] */
-  max-height: 85%; /* Gun shrinks to fit frame height[cite: 4] */
-  transform: rotate(-35deg) scale(1.2); /* Uniform rotation[cite: 4] */
-  object-fit: contain;
-  filter: drop-shadow(0 0 10px rgba(0,0,0,0.8));
-  transition: 0.3s;
-  pointer-events: none;
-}
-
-/* CARD SYSTEM[cite: 4] */
+/* CARD SYSTEM */
 .nm-card { width: 210px; height: 320px; cursor: pointer; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
 .nm-card.flipped { transform: rotateY(180deg); }
 .nm-card-inner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; }
@@ -61,22 +98,19 @@
 .nm-front { background: #101823; display: flex; align-items: center; justify-content: center; z-index: 2; }
 .nm-diamond { width: 44px; height: 44px; transform: rotate(45deg); transition: 0.3s; }
 
-/* TIER BACKGROUNDS[cite: 3, 4] */
+/* TIER GRADIENTS */
 .nm-back { transform: rotateY(180deg); display: flex; flex-direction: column; padding: 15px; position: relative; }
 .tier-bg-select { background: linear-gradient(180deg, #101823, #1e364d); }
 .tier-bg-deluxe { background: linear-gradient(180deg, #101823, #004d4b); }
 .tier-bg-premium { background: linear-gradient(180deg, #101823, #4d1e36); }
-.tier-bg-gold { background: linear-gradient(180deg, #101823, #5c3b1e); }
+.tier-bg-gold { background: linear-gradient(180deg, #101823, #5c3b1e) !important; }
 
-/* FOOTER[cite: 4] */
-.nm-footer {
-  position: absolute; bottom: 12px; left: 0; width: 100%;
-  display: flex; justify-content: space-between; align-items: flex-end;
-  padding: 0 12px; box-sizing: border-box;
-}
+/* ASSETS */
+.nm-img-box { flex: 1; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+.nm-weapon-asset { left: -1px; max-width: 90%; max-height: 85%; transform: rotate(45deg) scale(1.2); filter: drop-shadow(0 0 10px rgba(0,0,0,0.8)); pointer-events: none; }
 
-.nm-info h4 { font-family: 'Anton', sans-serif; font-size: 0.75rem; color: #ece8e1; text-transform: uppercase; margin: 0; letter-spacing: 0.5px; line-height: 1.2; text-align: left; max-width: 75%; }
-.nm-price { color: white; font-size: 0.8rem; text-align: right; }
+.nm-footer { position: absolute; bottom: 12px; left: 0; width: 100%; display: flex; justify-content: space-between; padding: 0 12px; box-sizing: border-box; }
+.nm-info h4 { font-family: 'Anton', sans-serif; font-size: 0.8rem; color: #ece8e1; text-transform: uppercase; margin: 0; line-height: 1.7; text-align: left; }
+.nm-price { color: white; font-family: 'Anton'; font-size: 0.85rem; }
 .nm-discount { position: absolute; top: 12px; left: 12px; color: #ff4655; font-family: 'Anton'; font-size: 1.5rem; z-index: 10; }
-.nm-title { font-family: 'Anton', sans-serif; font-size: 8rem; color: #ece8e1; margin: 0 0 30px; opacity: 0.95; }
-.nm-status { color: #ff4655; font-family: 'Anton'; font-size: 2rem; margin-top: 40px; }
+.nm-title { font-family: 'Anton', sans-serif; font-size: 8.5rem; color: #ece8e1; margin: 0 0 20px; opacity: 0.95; letter-spacing: -2px; }

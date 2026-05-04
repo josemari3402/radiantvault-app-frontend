@@ -18,7 +18,7 @@
 }
 .tactical-btn:hover { background: white; color: #ff4655; box-shadow: 0 0 15px rgba(255, 70, 85, 0.6); }
 
-.logout-pos { position: absolute; top: 20px; right: 40px; }
+.logout-pos { position: absolute; top: 12px; right: 30px; }
 
 /* ARSENAL GRID */
 .main-lab-layout { display: flex; padding: 10vh 40px 20px 40px; gap: 25px; flex: 1; min-height: 0; }
