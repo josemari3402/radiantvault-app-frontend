@@ -11,106 +11,85 @@
   display: flex; flex-direction: column; align-items: center; padding-top: 140px;
 }
 
-/* TOP BAR RE-ALIGNMENT */
+/* TOP BAR: Re-aligned to allow center navigation clicks */
 .nm-top-bar {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100px; 
-  pointer-events: none; /* This fixes the unclickable Vault/Nightmarket buttons */
+  top: 0; left: 0; width: 100%;
+  height: 0; /* Ensures the container doesn't block the center of the screen[cite: 1] */
+  pointer-events: none; 
   z-index: 2001;
 }
 
 .nm-btn-group {
   position: absolute;
-  top: 29px;
+  top: 29px; /* Unified top alignment[cite: 1] */
   left: 25px;
-  display: flex;
-  gap: 15px;
-  pointer-events: auto; /* Re-enables clicking for buttons */
+  display: flex; gap: 15px;
+  pointer-events: auto; /* Restores clicks to buttons[cite: 1] */
 }
 
 .nm-vol-box {
   position: absolute;
-  top: 20px;   /* Change this to move sliders up or down */
-  right: 180px; /* Change this to move sliders left or right */
-  display: flex;
-  gap: 30px;
+  top: 20px; /* Unified top alignment[cite: 1] */
+  right: 180px;
+  display: flex; gap: 30px;
   background: rgba(15, 25, 35, 0.7);
   padding: 5px 20px;
   border: 1px solid rgba(255, 70, 85, 0.2);
   backdrop-filter: blur(5px);
   align-items: center;
-  pointer-events: auto; /* Re-enables clicking for sliders */
+  pointer-events: auto; /* Restores clicks to sliders[cite: 1] */
 }
 
-.vol-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+.vol-item { display: flex; align-items: center; gap: 12px; }
+.vol-label { font-family: 'Anton', sans-serif; color: #ff4655; font-size: 0.8rem; letter-spacing: 1px; }
 
-.vol-label {
-  font-family: 'Anton', sans-serif;
-  color: #ff4655;
-  font-size: 0.8rem;
-  letter-spacing: 1px;
-}
-
-/* TACTICAL SLIDER SYNC (Match Loadout Lab) */
+/* TACTICAL SLIDER SYNC: Matches Loadout Lab's intense glow[cite: 1] */
 .tactical-slider {
   -webkit-appearance: none;
-  width: 100px;
-  height: 2px;
-  background: rgba(255, 255, 255, 0.1);
-  outline: none;
-  cursor: pointer;
+  width: 110px; height: 2px;
+  background: rgba(255, 255, 255, 0.15);
+  outline: none; cursor: pointer;
 }
 
 .tactical-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 10px;
-  height: 10px;
+  width: 12px; height: 12px;
   background: #ff4655;
-  border-radius: 0; /* Keeps the thumb square */
-  box-shadow: 0 0 10px #ff4655, 0 0 5px #ff4655; /* The intense red glow */
+  border-radius: 0;
   cursor: pointer;
+  /* Increased bloom/glow to match image_c64c7e.png[cite: 1] */
+  box-shadow: 0 0 14px #ff4655, 0 0 6px #ff4655; 
 }
 
 /* HORIZONTAL ROW */
 .nm-horizontal-row {
   display: flex !important;
-  flex-direction: row !important;
   justify-content: center;
-  gap: 20px;
-  width: 100%;
-  perspective: 2000px;
-  margin-top: 30px;
+  gap: 20px; width: 100%; margin-top: 30px;
 }
 
 /* CARD SYSTEM */
 .nm-card { width: 210px; height: 320px; cursor: pointer; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
 .nm-card.flipped { transform: rotateY(180deg); }
 .nm-card-inner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; }
-
 .nm-front, .nm-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border: 3px solid; transition: 0.3s; }
 .nm-front { background: #101823; display: flex; align-items: center; justify-content: center; z-index: 2; }
 .nm-diamond { width: 44px; height: 44px; transform: rotate(45deg); transition: 0.3s; }
 
-/* TIER GRADIENTS */
+/* TIER GRADIENTS[cite: 1] */
 .nm-back { transform: rotateY(180deg); display: flex; flex-direction: column; padding: 15px; position: relative; }
 .tier-bg-select { background: linear-gradient(180deg, #101823, #1e364d); }
 .tier-bg-deluxe { background: linear-gradient(180deg, #101823, #004d4b); }
 .tier-bg-premium { background: linear-gradient(180deg, #101823, #4d1e36); }
 .tier-bg-gold { background: linear-gradient(180deg, #101823, #5c3b1e) !important; }
 
-/* ASSETS */
-.nm-img-box { flex: 1; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
-.nm-weapon-asset { left: -1px; max-width: 90%; max-height: 85%; transform: rotate(45deg) scale(1.2); filter: drop-shadow(0 0 10px rgba(0,0,0,0.8)); pointer-events: none; }
+/* ASSETS[cite: 1] */
+.nm-img-box { flex: 1; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; }
+.nm-weapon-asset { max-width: 85%; max-height: 85%; transform: rotate(45deg) scale(1.25); filter: drop-shadow(0 0 10px rgba(0,0,0,0.8)); pointer-events: none; }
 
 .nm-footer { position: absolute; bottom: 12px; left: 0; width: 100%; display: flex; justify-content: space-between; padding: 0 12px; box-sizing: border-box; }
-.nm-info h4 { font-family: 'Anton', sans-serif; font-size: 0.8rem; color: #ece8e1; text-transform: uppercase; margin: 0; line-height: 1.7; text-align: left; }
-.nm-price { color: white; font-family: 'Anton'; font-size: 0.85rem; }
+.nm-info h4 { font-family: 'Anton', sans-serif; font-size: 0.75rem; color: #ece8e1; text-transform: uppercase; margin: 0; line-height: 1.8; text-align: left; }
+.nm-price { color: white; font-family: 'Anton'; font-size: 0.9rem; }
 .nm-discount { position: absolute; top: 12px; left: 12px; color: #ff4655; font-family: 'Anton'; font-size: 1.5rem; z-index: 10; }
 .nm-title { font-family: 'Anton', sans-serif; font-size: 8.5rem; color: #ece8e1; margin: 0 0 20px; opacity: 0.95; letter-spacing: -2px; }

@@ -2,13 +2,18 @@ import React, { useState, useEffect, useCallback } from 'react';
 import './nightmarket.css';
 import nmBg from '../assets/nightmarket_bg.png';
 
+// THE "X" KILLER: Prioritizes chromas for high-tier skins
 const getSkinImage = (skin) => {
   if (!skin) return "";
-  // Check for broken icons and fallback to chromas (the "X" fix)
-  if (skin.displayIcon && skin.displayIcon.length > 10) return skin.displayIcon;
+  
+  // Check chromas first; they are the most reliable source for skins like Sovereign[cite: 2]
   if (skin.chromas && skin.chromas.length > 0) {
     return skin.chromas[0].fullRender || skin.chromas[0].displayIcon;
   }
+  
+  // Fallback for lower tier skins that don't have chromas[cite: 2]
+  if (skin.displayIcon && skin.displayIcon.length > 10) return skin.displayIcon;
+  
   return skin.fullRender || "";
 };
 
@@ -36,6 +41,7 @@ const Nightmarket = ({ allSkins, onBack, bgmVolume, sfxVolume, onBgmChange, onSf
              ALLOWED_COLLECTIONS.DELUXE.some(c => name.includes(c)) ||
              ALLOWED_COLLECTIONS.PREMIUM.some(c => name.includes(c));
     });
+    
     if (eligible.length === 0) return;
 
     const selection = eligible.sort(() => 0.5 - Math.random()).slice(0, 6).map(skin => {
@@ -76,6 +82,8 @@ const Nightmarket = ({ allSkins, onBack, bgmVolume, sfxVolume, onBgmChange, onSf
   return (
     <div className="nm-container" style={{ backgroundImage: `url(${nmBg})` }}>
       <div className="nm-overlay">
+        
+        {/* TOP BAR: Uses absolute positioning to keep groups separate */}
         <div className="nm-top-bar">
           <div className="nm-btn-group">
             <button className="tactical-btn" onClick={onBack} onMouseEnter={onHover}>◄ BACK</button>
@@ -95,6 +103,7 @@ const Nightmarket = ({ allSkins, onBack, bgmVolume, sfxVolume, onBgmChange, onSf
         </div>
 
         <h1 className="nm-title">NIGHT.MARKET</h1>
+        
         <div className="nm-horizontal-row" key={shuffleKey}>
           {marketSkins.length > 0 ? (
             marketSkins.map((skin, i) => (
@@ -133,10 +142,12 @@ const NMCard = ({ skin, onHover, onChoose }) => {
         <div className="nm-front" style={{ borderColor: currentGlow, boxShadow: `0 0 20px ${currentGlow}` }}>
           <div className="nm-diamond" style={{ background: currentGlow }}></div>
         </div>
+        
         <div className={`nm-back tier-bg-${skin.isMelee ? 'gold' : skin.tierKey.toLowerCase()}`} style={{ borderColor: currentGlow, boxShadow: `0 0 20px ${currentGlow}` }}>
           <div className="nm-discount">-{skin.marketDiscount}%</div>
           <div className="nm-img-box">
-            <img src={getSkinImage(skin)} className="nm-weapon-asset" alt={skin.displayName} />
+            {/* Uses helper to kill Sovereign "X"[cite: 2] */}
+            <img src={getSkinImage(skin)} className="nm-weapon-asset" alt="" />
           </div>
           <div className="nm-footer">
             <div className="nm-info"><h4>{skin.displayName}</h4></div>
